@@ -3,6 +3,8 @@
 # ============================================
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+import os
+DATABASE_URL = os.environ.get('DATABASE_URL')
 import psycopg2 
 from psycopg2 import errors
 from datetime import datetime, timedelta
@@ -10,7 +12,7 @@ from abc import ABC, abstractmethod
 from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this-to-random-string-123456'
+app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
 
 # ============================================
 # PHẦN 1: CÁC CLASS OOP
@@ -19,26 +21,32 @@ app.secret_key = 'your-secret-key-change-this-to-random-string-123456'
 class DatabaseManager:
     """Class quản lý database PostgreSQL"""
     
-    # !!! THAY ĐỔI THÔNG SỐ KẾT NỐI CỦA BẠN TẠI ĐÂY !!!
-    DB_NAME = "library_db"
-    DB_USER = "admin"
-    DB_PASSWORD = "1234" 
-    DB_HOST = "localhost"
-    DB_PORT = "5432"
+    # KHAI BÁO CỤC BỘ DỰ PHÒNG CHO CHẾ ĐỘ LOCAL
+    LOCAL_DB_CONFIG = {
+        'dbname': "library_db",
+        'user': "admin",
+        'password': "1234",
+        'host': "localhost",
+        'port': "5432"
+    }
 
     def __init__(self):
+        # Lấy chuỗi kết nối đã khai báo ở đầu file (DATABASE_URL)
+        self.DATABASE_URL = os.environ.get('DATABASE_URL')
+        if not self.DATABASE_URL:
+            print("CẢNH BÁO: Không tìm thấy DATABASE_URL. Đang sử dụng cấu hình cục bộ.")
         self.init_database()
 
     def get_connection(self):
         """Tạo kết nối database PostgreSQL"""
         try:
-            conn = psycopg2.connect(
-                dbname=self.DB_NAME,
-                user=self.DB_USER,
-                password=self.DB_PASSWORD,
-                host=self.DB_HOST,
-                port=self.DB_PORT
-            )
+            if self.DATABASE_URL:
+                # Sử dụng chuỗi kết nối trực tuyến (cho Render)
+                conn = psycopg2.connect(self.DATABASE_URL)
+            else:
+                # Sử dụng thông số cục bộ (chỉ khi chạy local và không có env var)
+                conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)
+            
             return conn
         except psycopg2.Error as e:
             print(f"LỖI KẾT NỐI POSTGRESQL: {e}")
