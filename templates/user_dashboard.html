@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% block content %}
+<div>
+    <div>
+        <div>
+            <h1>Xin chào, {{ user.username }} 👋</h1>
+            <p>Điểm tích lũy: <span>{{ user.points }}</span></p>
+        </div>
+        <a href="{{ url_for('logout') }}">🚪 Đăng xuất</a>
+    </div>
+
+    <div>
+        <h2>🛒 Giỏ Hàng Của Bạn ({{ cart|length }})</h2>
+        
+        {% if cart %}
+        <ul>
+            {% for item in cart %}
+            <li>
+                <img src="{{ item[5] or url_for('static', filename='images/default_book.jpg') }}" 
+                     alt="{{ item[2] }}" 
+                     class="cart-book-img"
+                     width="50" height="70">
+                <div>
+                    <p>{{ item[2] }}</p>
+                    <p>{{ item[3] }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        <a href="{{ url_for('checkout') }}">
+            ✅ Xác Nhận Mượn Sách (Checkout)
+        </a>
+        
+        {% else %}
+        <p>Giỏ hàng trống. Hãy chọn sách bạn muốn mượn!</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>📚 Danh sách sách có sẵn</h2>
+    <div class="book-list-grid"> {% for book in books %}
+        <div class="book-card-item">
+            
+            <img src="{{ book.image_url or url_for('static', filename='images/default_book.jpg') }}" 
+                alt="Bìa sách {{ book.title }}" 
+                class="book-list-img">
+            
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>{{ book.category }}</p>
+            <p>Còn lại: 
+                <span>
+                    {{ book.available }}
+                </span> / {{ book.quantity }}
+            </p>
+
+            <div>
+                {% if book.available > 0 %}
+                    <a href="{{ url_for('add_to_cart', book_id=book.id) }}" class="add-to-cart-btn">
+                        🛒 Thêm vào Giỏ
+                    </a>
+                {% else %}
+                    <button disabled class="out-of-stock-btn">
+                        Hết Sách
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <p>Không có sách nào trong thư viện 😢</p>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>📖 Sách Bạn Đang Mượn</h2>
+    <div>
+        {% if borrowed %}
+        <ul>
+            {% for trans in borrowed %}
+            <li>
+                
+                <img src="{{ trans[5] or url_for('static', filename='images/default_book.jpg') }}" 
+                     alt="{{ trans[1] }}" 
+                     width="50" height="70">
+                
+                <div>
+                    <p>{{ trans[1] }}</p>
+                    <p>Tác giả: {{ trans[2] }}</p>
+                    <p>Hạn trả: {{ trans[4] }}</p>
+                </div>
+                
+                <a href="{{ url_for('return_book', transaction_id=trans[0]) }}">
+                    ↩️ Trả Sách
+                </a>
+                
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Bạn chưa mượn sách nào 📭</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

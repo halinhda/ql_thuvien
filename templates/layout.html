@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ Thống Quản Lý Thư Viện{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
+    
+</head>
+<body>
+
+    <nav>
+        <div>
+            <a href="{{ url_for('index') }}">
+                Thư Viện
+            </a>
+            
+            <div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('index') }}">Trang Chủ</a>
+                    </li>
+
+                    {% if session.get('user') %}
+                        {% if session['user']['role'] == 'admin' %}
+                        <li>
+                            <a href="{{ url_for('admin_dashboard') }}">Quản Lý</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="{{ url_for('user_dashboard') }}">Tủ Sách Của Tôi</a>
+                        </li>
+                        {% endif %}
+
+                        <li>
+                            <a href="{{ url_for('logout') }}">Đăng Xuất</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{ url_for('login') }}">Đăng Nhập</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('register') }}">Đăng Ký</a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        <div>
+            <span>© 2025 Hệ Thống Quản Lý Thư Viện.</span>
+        </div>
+    </div>
+
+    </body>
+</html>

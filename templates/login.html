@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Đăng Nhập Tài Khoản{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <div class="login-form">
+            <div>
+                <h4>Đăng nhập</h4>
+            </div>
+            <div>
+                
+                <form action="{{ url_for('login') }}" method="post">
+                    
+                    <div>
+                        <label for="username">Tên đăng nhập:</label>
+                        <input type="text" id="username" name="username" required class="form-control">
+                    </div>
+                    
+                    <div>
+                        <label for="password">Mật khẩu:</label>
+                        <input type="password" id="password" name="password" required class="form-control">
+                    </div>
+                    
+                    <div>
+                        <button type="submit">Đăng nhập</button>
+                    </div>
+                    
+                </form>
+                
+                <hr>
+                <p>
+                    Chưa có tài khoản?
+                    <a href="{{ url_for('register') }}">Đăng ký ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

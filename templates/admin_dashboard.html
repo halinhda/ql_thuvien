@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block content %}
+<div>
+    <div>
+        <h1>Xin chào, Admin {{ user.username }} 👑</h1>
+        <a href="{{ url_for('logout') }}">Đăng xuất</a>
+    </div>
+
+    <hr>
+
+    <h2>📊 Thống kê hệ thống</h2>
+    <div>
+        <ul>
+            <li>📘 Tổng số sách: <strong>{{ stats.total_books }}</strong></li>
+            <li>📦 Tổng bản sao: <strong>{{ stats.total_copies }}</strong></li>
+            <li>📕 Đang cho mượn: <strong>{{ stats.borrowed_copies }}</strong></li>
+            <li>👥 Tổng người dùng: <strong>{{ stats.total_users }}</strong></li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2>➕ Thêm sách mới</h2>
+    <form method="POST" action="{{ url_for('admin_add_book') }}">
+        <div>
+            <input name="title" placeholder="Tên sách" required>
+            <input name="author" placeholder="Tác giả" required>
+            <input name="category" placeholder="Thể loại">
+            <input name="year" type="number" placeholder="Năm xuất bản">
+            <input name="quantity" type="number" placeholder="Số lượng">
+            <input name="image_url" placeholder="URL Hình ảnh (tùy chọn)">
+        </div>
+        <button type="submit">Thêm sách</button>
+    </form>
+
+    <hr>
+
+    <h2>📚 Quản lý sách</h2>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>Số lượng</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.quantity }}</td>
+
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_add_stock', book_id=book.id) }}" style="display: flex; gap: 5px;">
+                            <input type="number" 
+                                  name="quantity_added" 
+                                  placeholder="SL Thêm" 
+                                  required min="1" 
+                                  style="width: 70px;">
+                                  
+                            <button type="submit" style="white-space: nowrap;">➕ Thêm</button>
+                        </form>
+                    </td>
+
+                    <td>
+                        <a href="{{ url_for('admin_delete_book', book_id=book.id) }}">Xóa</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

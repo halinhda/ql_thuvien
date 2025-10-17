@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Đăng Ký Tài Khoản{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <div class="register-form"> 
+            <div>
+                <h4>📝 Đăng ký</h4>
+            </div>
+            <div>
+                <form action="{{ url_for('register') }}" method="post">
+                    <div>
+                        <label for="username">Tên đăng nhập:</label>
+                        <input type="text" id="username" name="username" required class="form-control">
+                    </div>
+                    
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required class="form-control">
+                    </div>
+                    
+                    <div>
+                        <label for="password">Mật khẩu:</label>
+                        <input type="password" id="password" name="password" required class="form-control">
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="btn-success">Tạo tài khoản</button>
+                    </div>
+                    
+                </form>
+                
+                <hr>
+                <p>
+                    Đã có tài khoản? 
+                    <a href="{{ url_for('login') }}">Đăng nhập ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

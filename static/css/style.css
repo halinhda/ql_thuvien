@@ -1,0 +1,733 @@
+/* ==========================================================
+ * CÁC QUY TẮC CSS CHUNG VÀ CƠ BẢN
+ * ========================================================== */
+
+/* Đảm bảo HTML và Body cao 100% */
+html, body {
+    height: 100%;
+}
+
+/* Khoảng đệm cho footer cố định không che khuất nội dung */
+body {
+    padding-top: 56px;    /* Chiều cao của Navbar (fixed-top) */
+    padding-bottom: 150px; /* Chiều cao của Footer */
+    background-color: #f7f7f7; /* Màu nền nhẹ */
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+/* Định dạng container chung cho nội dung chính (DIV bao block content) */
+body > div:nth-child(2) {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+/* Dấu gạch ngang */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 20px 0;
+}
+
+/* Định dạng tiêu đề */
+h1 { font-size: 2rem; color: #007bff; text-align: center; margin-bottom: 20px; }
+h2 { font-size: 1.5rem; color: #333; margin-top: 25px; margin-bottom: 15px; }
+
+
+/* ==========================================================
+ * NAVBAR VÀ FOOTER (Từ layout.html)
+ * Tái tạo Navbar cố định và Footer cố định
+ * ========================================================== */
+
+nav {
+    background-color: #007bff; /* Màu primary */
+    color: white;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav > div {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    transition: background-color 0.2s;
+}
+
+nav a:hover {
+    background-color: #0056b3;
+    border-radius: 4px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 10px;
+}
+
+/* Định dạng Footer cố định ở cuối */
+.footer {
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa; /* Màu light */
+    border-top: 1px solid #e7e7e7;
+    line-height: 40px; 
+    z-index: 999; 
+}
+
+.footer div {
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.footer span {
+    color: #6c757d;
+}
+
+.user-dashboard-section {
+    /* ... các thuộc tính khác ... */
+    position: relative; 
+    z-index: 101; /* Phải cao hơn z-index của footer (100) */
+}
+
+/* ==========================================================
+ * FORM ĐĂNG KÝ VÀ ĐĂNG NHẬP (login.html, register.html)
+ * Sử dụng móc nối .register-form và .login-form
+ * ========================================================== */
+
+/* Canh giữa và giới hạn chiều rộng của form */
+.register-form, .login-form {
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.register-form h4, .login-form h4 {
+    text-align: center;
+    color: white;
+    background-color: #007bff;
+    padding: 15px;
+    margin: -30px -30px 20px -30px; /* Tạo header card */
+    border-radius: 8px 8px 0 0;
+}
+
+.register-form label, .login-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Khung input */
+.register-form input, .login-form input,
+.form-control { 
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Giúp padding không làm tăng chiều rộng input */
+}
+
+/* Tái tạo hiệu ứng focus cho input */
+.form-control:focus, 
+.register-form input:focus, .login-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    border-color: #007bff;
+}
+
+/* Nút đăng ký (register)*/
+.register-form button[type="submit"], .btn-success {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    color: white;
+    background-color: #04caed; 
+    transition: background-color 0.2s;
+}
+
+.register-form button[type="submit"]:hover, .btn-success:hover {
+    background-color: #06c3e4;
+}
+
+/* Nút đăng nhập (login) - Dùng màu primary */
+.login-form button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    color: white;
+    background-color: #007bff;
+}
+.login-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Phần "Đã có tài khoản?" */
+.login-form p:last-child, .register-form p:last-child {
+    text-align: center;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+
+/* ==========================================================
+ * TRANG CHỦ (index.html)
+ * Sử dụng móc nối .book-grid và .book-card
+ * ========================================================== */
+
+/* Định dạng lưới sách */
+.book-grid { 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.book-card-img {
+    /* Đặt chiều cao và chiều rộng cố định */
+    width: 100px; 
+    height: 150px; 
+    object-fit: cover; /* Cắt ảnh để vừa vặn */
+    margin: 0 auto 15px auto; /* Căn giữa và tạo khoảng cách dưới */
+    border-radius: 4px;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+/* Hiệu ứng thẻ sách */
+.book-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.book-card h5 {
+    color: #17a2b8; /* text-info */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+.book-card h6 {
+    color: #6c757d; /* text-muted */
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+.book-card p:last-of-type { /* Tình trạng sách */
+    margin-top: auto; 
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+/* Tình trạng sách (span) */
+.book-card p:last-of-type span:last-of-type {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: white;
+    display: inline-block;
+}
+.book-card p:last-of-type span:last-of-type:not(:nth-last-child(2)) {
+    background-color: #28a745; /* Còn mượn - bg-success */
+}
+.book-card p:last-of-type span:last-of-type:nth-last-child(2) {
+    background-color: #dc3545; /* Hết sách - bg-danger */
+}
+
+/* Nút Chi Tiết */
+.book-card a:first-of-type {
+    display: block;
+    text-align: center;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 10px;
+    order: 3; 
+}
+.book-card a:first-of-type:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Nút Thêm vào Giỏ */
+.book-card a:nth-of-type(2) {
+    display: block;
+    text-align: center;
+    padding: 8px 15px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 5px;
+    order: 4;
+}
+.book-card button[disabled] {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: not-allowed;
+    margin-top: 5px;
+}
+
+
+/* ==========================================================
+ * TRANG CHI TIẾT SÁCH (book_detail.html)
+ * Sử dụng móc nối .book-detail-wrapper
+ * ========================================================== */
+
+/* ==========================================================
+ * TRANG CHI TIẾT SÁCH (book_detail.html)
+ * ========================================================== */
+
+/* Bố cục 2 cột chính dùng Flexbox */
+.book-detail-wrapper {
+    display: flex;
+    gap: 30px; /* Khoảng cách giữa 2 cột: Ảnh và Thông tin */
+    margin-top: 30px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Cột Ảnh: Cố định chiều rộng (300px) */
+.book-image-col {
+    flex: 0 0 300px; 
+}
+/* Cột Thông tin: Chiếm hết phần không gian còn lại */
+.book-info-col {
+    flex: 1;
+}
+
+/* Định dạng Hình ảnh Sách (Quan trọng: Đảm bảo kích thước chuẩn) */
+.detail-book-img {
+    width: 100%;
+    /* Đặt chiều cao cố định để tất cả ảnh đều bằng nhau (giống như thumbnail) */
+    height: 350px; 
+    object-fit: cover; /* Cắt ảnh để vừa khung mà không bị méo */
+    border-radius: 8px;
+    /* Hiệu ứng nổi bật cho ảnh */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
+}
+
+/* Định dạng Bảng thông tin chi tiết */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 0.95em; /* Giảm cỡ chữ cho bảng */
+}
+.detail-table th, .detail-table td {
+    border: 1px solid #dee2e6;
+    padding: 12px;
+    text-align: left;
+}
+.detail-table th {
+    background-color: #f8f9fa; /* Nền xám nhạt cho tiêu đề cột */
+    width: 30%; /* Cố định chiều rộng cột tiêu đề (Tác giả, Thể loại,...) */
+    font-weight: 600;
+}
+/* Tạo hiệu ứng sọc ngang cho bảng (zebra-striping) */
+.detail-table tr:nth-child(odd) td {
+    background-color: #f2f2f2;
+}
+
+/* Định dạng tiêu đề mô tả */
+.book-info-col h4 {
+    margin-top: 25px; 
+    margin-bottom: 10px;
+    color: #333;
+}
+/* Định dạng phần Mô tả sách */
+.book-info-col p {
+    line-height: 1.7; /* Tăng khoảng cách dòng cho dễ đọc */
+    color: #555;
+}
+
+/* Nút Hành động (Thêm vào Giỏ / Mượn ngay) */
+.book-info-col a {
+    margin-right: 15px; /* Khoảng cách giữa các nút */
+    margin-top: 15px;
+}
+/* Định dạng chung cho tất cả các nút (để dễ dàng thay thế class .btn-primary) */
+.book-info-col .btn-action { 
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+.book-info-col .btn-action:hover {
+    background-color: #0056b3;
+}
+
+/* Định dạng cho nút Hết Sách */
+.book-info-col button[disabled] {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: not-allowed;
+    display: inline-block;
+    font-weight: bold;
+}
+
+/*====ĐỊNH DẠNG NÚT QUAY LẠI TRANG CHỦ==== */
+/* ==========================================================
+ * ĐỊNH DẠNG NÚT QUAY LẠI TRANG CHỦ
+ * ========================================================== */
+.btn-back {
+    display: inline-block; /* Quan trọng: để áp dụng padding */
+    margin-top: 15px;      /* Tạo khoảng cách với tiêu đề */
+    margin-bottom: 20px;   /* Tạo khoảng cách với khối nội dung chính */
+    padding: 8px 15px;
+    background-color: #00acf0; /* Màu xám trung tính */
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.btn-back:hover {
+    background-color: #007596;
+}
+
+/* ==========================================================
+ * TRANG USER DASHBOARD (user_dashboard.html)
+ * ========================================================== */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Định dạng Giỏ hàng (Cart) và Sách đang mượn (Borrowed) */
+.user-dashboard-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+}
+
+/* Danh sách sách mượn/giỏ hàng */
+.user-dashboard-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 100px 0;
+}
+.user-dashboard-section li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* ĐỊNH DẠNG CHUNG cho tất cả ảnh trong LI (Giữ lại border-radius & box-shadow) */
+.user-dashboard-section li img {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Định dạng ảnh Giỏ hàng/Đang mượn (Dùng class để thiết lập kích thước & margin) */
+.cart-book-img {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    margin-right: 10px; /* Đã sửa: giá trị mong muốn được áp dụng */
+    flex-shrink: 0;
+}
+
+.user-dashboard-section li div:nth-child(2) {
+    flex-grow: 1;
+}
+
+/* ==========================================================
+ * QUY TẮC CHUNG CHO NÚT HÀNH ĐỘNG CHÍNH (PRIMARY/SUCCESS)
+ * **ĐÃ GỘP MÀU SẮC** cho Checkout và Thêm vào Giỏ hàng
+ * ========================================================== */
+
+/* Định dạng chung: Màu nền, màu chữ và transition */
+[href*="checkout"], .add-to-cart-btn {
+    background-color: #2facff;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+[href*="checkout"]:hover, .add-to-cart-btn:hover {
+    background-color: #1e7e34;
+}
+
+/* Nút Checkout (Xác nhận Mượn) - Quy tắc cụ thể */
+[href*="checkout"] {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 12px 15px !important;
+    font-size: 1.2rem;
+}
+
+/* Nút Trả Sách - (Action phụ) */
+.user-dashboard-section li a {
+    padding: 8px 15px;
+    /* transition đã được gộp ở trên */
+    white-space: nowrap;
+}
+[href*="return-book"] {
+    background-color: #ffc107; /* Màu warning */
+    color: #333;
+    border: 1px solid #ffc107;
+}
+[href*="return-book"]:hover {
+    background-color: #e0a800;
+}
+
+/* ==========================================================
+ * DANH SÁCH SÁCH CÓ SẴN (Phần dưới của user_dashboard.html)
+ * ========================================================== */
+
+/* Bố cục lưới cho danh sách sách có sẵn */
+.book-list-grid {
+    display: grid;
+    /* Chia lưới tự động, mỗi ô rộng tối thiểu 250px */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Định dạng từng thẻ sách */
+.book-card-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Định dạng ảnh bìa sách */
+.book-list-img {
+    width: 100%;
+    max-width: 120px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin: 0 auto 10px auto;
+}
+
+/* Đảm bảo nút ở dưới cùng */
+.book-card-item > div:last-child {
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+/* ==========================================================
+ * ĐỊNH DẠNG NÚT THÊM VÀO GIỎ HÀNG (TRONG DANH SÁCH SÁCH)
+ * ========================================================== */
+
+.add-to-cart-btn {
+    /* Đảm bảo nút chiếm toàn bộ chiều rộng */
+    display: block; 
+    width: 100%;
+    
+    /* Màu sắc và hình thức */
+    background-color: #00cefc; /* Màu xanh sáng */
+    color: white;
+    /* CHỈNH SỬA: Bỏ padding ngang để tránh tràn (10px 0px thay vì 10px 15px) */
+    padding: 10px 0px; 
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    
+    /* Hiệu ứng chuyển động */
+    transition: background-color 0.2s ease-in-out, transform 0.1s;
+    margin-top: 5px; 
+    text-align: center;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #6d91ff; 
+    transform: translateY(-1px);
+}
+
+/* Định dạng Nút Hết Sách (Disabled) */
+.out-of-stock-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #6c757d; /* Màu xám (Màu muted) */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: not-allowed;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* ==========================================================
+ * TRANG ADMIN DASHBOARD (admin_dashboard.html)
+ * Sử dụng móc nối .admin-section
+ * ========================================================== */
+
+.admin-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+}
+
+.admin-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Bố cục ngang cho thống kê */
+    gap: 30px;
+}
+
+/* Form Add Book */
+.form-add-book > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-add-book input {
+    /* Kế thừa style .form-control */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.form-add-book button[type="submit"] {
+    /* Tái tạo nút Thêm sách (màu xanh lá) */
+    background-color: #55e6ff; 
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.form-add-book button[type="submit"]:hover {
+    background-color: #35f2ff; 
+}
+
+/* Table Management */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-section th, .admin-section td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
+}
+
+.admin-section thead th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.admin-section tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* ==========================================================
+ * THÔNG BÁO FLASH (Cần thêm vào style.css)
+ * ========================================================== */
+.flash-messages {
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 0 15px;
+}
+
+.flash-success, .flash-error {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid transparent;
+}
+
+.flash-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.flash-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
