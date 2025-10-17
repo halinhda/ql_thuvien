@@ -141,11 +141,11 @@ class DatabaseManager:
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
                 books = [
-                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://salt.tikicdn.com/cache/750x750/ts/product/7e/14/a6/24a57c9536b51b41e3e9f8470cdf3ad3.jpg.webp', 'Sách về kỹ năng giao tiếp'),
+                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://www.pinterest.com/pin/598486238013000746/', 'Sách về kỹ năng giao tiếp'),
                     ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, 'https://salt.tikicdn.com/cache/750x750/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg.webp', 'Lịch sử loài người'),
-                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, 'https://m.media-amazon.com/images/I/51E2055ZGUL._SY445_SX342_.jpg', 'Viết code sạch'),
-                    ('Hoàng Tử Bé', 'Antoine de Saint-Exupéry', 'Văn học', 2015, 6, 6, 'https://salt.tikicdn.com/cache/750x750/ts/product/45/3b/fc/aa81d0a534b45706b5559248a4f33ed3.jpg.webp', 'Truyện thiếu nhi'),
-                    ('Nhà Giả Kim', 'Paulo Coelho', 'Văn học', 2017, 5, 5, 'https://salt.tikicdn.com/cache/750x750/ts/product/7a/85/d9/07e6c5758054c48ed9a47a09eba9c6f2.jpg.webp', 'Tiểu thuyết triết lý')
+                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH7Nf18r0Cl3J4krqX9d0RwpYTwEegGjPV1g&s', 'Viết code sạch'),
+                    ('Hoàng Tử Bé', 'Antoine de Saint-Exupéry', 'Văn học', 2015, 6, 6, 'https://www.pinterest.com/pin/241435230007160290/', 'Truyện thiếu nhi'),
+                    ('Nhà Giả Kim', 'Paulo Coelho', 'Văn học', 2017, 5, 5, 'https://www.pinterest.com/pin/21955116928868670/', 'Tiểu thuyết triết lý')
                 ]
                 
                 cursor.executemany('''
