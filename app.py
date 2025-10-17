@@ -141,11 +141,11 @@ class DatabaseManager:
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
                 books = [
-                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://www.pinterest.com/pin/598486238013000746/', 'Sách về kỹ năng giao tiếp'),
+                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://i.pinimg.com/1200x/8f/3e/6a/8f3e6a6fb0a7061091bd19c3f9731132.jpg', 'Sách về kỹ năng giao tiếp'),
                     ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, 'https://salt.tikicdn.com/cache/750x750/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg.webp', 'Lịch sử loài người'),
                     ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH7Nf18r0Cl3J4krqX9d0RwpYTwEegGjPV1g&s', 'Viết code sạch'),
-                    ('Hoàng Tử Bé', 'Antoine de Saint-Exupéry', 'Văn học', 2015, 6, 6, 'https://www.pinterest.com/pin/241435230007160290/', 'Truyện thiếu nhi'),
-                    ('Nhà Giả Kim', 'Paulo Coelho', 'Văn học', 2017, 5, 5, 'https://www.pinterest.com/pin/21955116928868670/', 'Tiểu thuyết triết lý')
+                    ('Hoàng Tử Bé', 'Antoine de Saint-Exupéry', 'Văn học', 2015, 6, 6, 'https://i.pinimg.com/736x/73/fe/f2/73fef2d17b9f311e713bee4bcba584d7.jpg', 'Truyện thiếu nhi'),
+                    ('Nhà Giả Kim', 'Paulo Coelho', 'Văn học', 2017, 5, 5, 'https://i.pinimg.com/736x/e7/9b/61/e79b615c3277569a59e312943707eeae.jpg', 'Tiểu thuyết triết lý')
                 ]
                 
                 cursor.executemany('''
