@@ -3,15 +3,16 @@
  * ========================================================== */
 
 /* Đảm bảo HTML và Body cao 100% */
-html, body {
+html,
+body {
     height: 100%;
 }
 
 /* Khoảng đệm cho footer cố định không che khuất nội dung */
 body {
-    padding-top: 56px;    /* Chiều cao của Navbar (fixed-top) */
-    padding-bottom: 150px; /* Chiều cao của Footer */
-    background-color: #f7f7f7; /* Màu nền nhẹ */
+    padding-top: 56px; 
+    padding-bottom: 150px; 
+    background-color: #f7f7f7; 
     font-family: Arial, sans-serif;
     color: #333;
 }
@@ -32,24 +33,33 @@ hr {
 }
 
 /* Định dạng tiêu đề */
-h1 { font-size: 2rem; color: #007bff; text-align: center; margin-bottom: 20px; }
-h2 { font-size: 1.5rem; color: #333; margin-top: 25px; margin-bottom: 15px; }
+h1 {
+    font-size: 2rem;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+}
 
+h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
 
 /* ==========================================================
- * NAVBAR VÀ FOOTER (Từ layout.html)
- * Tái tạo Navbar cố định và Footer cố định
+ * NAVBAR VÀ FOOTER (layout.html)
  * ========================================================== */
 
 nav {
-    background-color: #007bff; /* Màu primary */
+    background-color: #007bff; 
     color: white;
     padding: 10px 0;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 999;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 nav > div {
@@ -84,14 +94,13 @@ nav ul li {
     margin-left: 10px;
 }
 
-/* Định dạng Footer cố định ở cuối */
 .footer {
     bottom: 0;
     width: 100%;
-    background-color: #f8f9fa; /* Màu light */
+    background-color: #f8f9fa; 
     border-top: 1px solid #e7e7e7;
-    line-height: 40px; 
-    z-index: 999; 
+    line-height: 40px;
+    z-index: 999;
 }
 
 .footer div {
@@ -105,64 +114,59 @@ nav ul li {
     color: #6c757d;
 }
 
-.user-dashboard-section {
-    /* ... các thuộc tính khác ... */
-    position: relative; 
-    z-index: 101; /* Phải cao hơn z-index của footer (100) */
-}
-
 /* ==========================================================
  * FORM ĐĂNG KÝ VÀ ĐĂNG NHẬP (login.html, register.html)
- * Sử dụng móc nối .register-form và .login-form
  * ========================================================== */
 
-/* Canh giữa và giới hạn chiều rộng của form */
-.register-form, .login-form {
+.register-form,
+.login-form {
     max-width: 450px;
     margin-left: auto;
     margin-right: auto;
     background-color: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
 
-.register-form h4, .login-form h4 {
+.register-form h4,
+.login-form h4 {
     text-align: center;
     color: white;
     background-color: #007bff;
     padding: 15px;
-    margin: -30px -30px 20px -30px; /* Tạo header card */
+    margin: -30px -30px 20px -30px;
     border-radius: 8px 8px 0 0;
 }
 
-.register-form label, .login-form label {
+.register-form label,
+.login-form label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-/* Khung input */
-.register-form input, .login-form input,
-.form-control { 
+.register-form input,
+.login-form input,
+.form-control {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    box-sizing: border-box; /* Giúp padding không làm tăng chiều rộng input */
+    box-sizing: border-box;
 }
 
-/* Tái tạo hiệu ứng focus cho input */
-.form-control:focus, 
-.register-form input:focus, .login-form input:focus {
+.form-control:focus,
+.register-form input:focus,
+.login-form input:focus {
     outline: none;
-    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(0,123,255,0.25);
     border-color: #007bff;
 }
 
-/* Nút đăng ký (register)*/
-.register-form button[type="submit"], .btn-success {
+.register-form button[type="submit"],
+.btn-success {
     display: block;
     width: 100%;
     padding: 10px 15px;
@@ -171,15 +175,15 @@ nav ul li {
     border-radius: 6px;
     border: none;
     color: white;
-    background-color: #04caed; 
+    background-color: #04caed;
     transition: background-color 0.2s;
 }
 
-.register-form button[type="submit"]:hover, .btn-success:hover {
+.register-form button[type="submit"]:hover,
+.btn-success:hover {
     background-color: #06c3e4;
 }
 
-/* Nút đăng nhập (login) - Dùng màu primary */
 .login-form button[type="submit"] {
     display: block;
     width: 100%;
@@ -191,25 +195,23 @@ nav ul li {
     color: white;
     background-color: #007bff;
 }
+
 .login-form button[type="submit"]:hover {
     background-color: #0056b3;
 }
 
-/* Phần "Đã có tài khoản?" */
-.login-form p:last-child, .register-form p:last-child {
+.login-form p:last-child,
+.register-form p:last-child {
     text-align: center;
     color: #6c757d;
     margin-top: 15px;
 }
 
-
 /* ==========================================================
  * TRANG CHỦ (index.html)
- * Sử dụng móc nối .book-grid và .book-card
  * ========================================================== */
 
-/* Định dạng lưới sách */
-.book-grid { 
+.book-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
@@ -217,55 +219,53 @@ nav ul li {
 }
 
 .book-card-img {
-    /* Đặt chiều cao và chiều rộng cố định */
-    width: 100px; 
-    height: 150px; 
-    object-fit: cover; /* Cắt ảnh để vừa vặn */
-    margin: 0 auto 15px auto; /* Căn giữa và tạo khoảng cách dưới */
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    margin: 0 auto 15px auto;
     border-radius: 4px;
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
 }
 
-/* Hiệu ứng thẻ sách */
 .book-card {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     min-height: 250px;
     display: flex;
     flex-direction: column;
     text-align: center;
-
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .book-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1) !important;
 }
 
 .book-card h5 {
-    color: #17a2b8; /* text-info */
+    color: #17a2b8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
 }
+
 .book-card h6 {
-    color: #6c757d; /* text-muted */
+    color: #6c757d;
     font-size: 0.9rem;
     margin-bottom: 10px;
 }
-.book-card p:last-of-type { /* Tình trạng sách */
-    margin-top: auto; 
+
+.book-card p:last-of-type {
+    margin-top: auto;
     padding-top: 10px;
     border-top: 1px solid #eee;
     font-size: 0.9rem;
     text-align: left;
 }
 
-/* Tình trạng sách (span) */
 .book-card p:last-of-type span:last-of-type {
     font-weight: bold;
     padding: 4px 8px;
@@ -274,14 +274,15 @@ nav ul li {
     color: white;
     display: inline-block;
 }
+
 .book-card p:last-of-type span:last-of-type:not(:nth-last-child(2)) {
-    background-color: #28a745; /* Còn mượn - bg-success */
-}
-.book-card p:last-of-type span:last-of-type:nth-last-child(2) {
-    background-color: #dc3545; /* Hết sách - bg-danger */
+    background-color: #28a745;
 }
 
-/* Nút Chi Tiết */
+.book-card p:last-of-type span:last-of-type:nth-last-child(2) {
+    background-color: #dc3545;
+}
+
 .book-card a:first-of-type {
     display: block;
     text-align: center;
@@ -291,14 +292,14 @@ nav ul li {
     text-decoration: none;
     border-radius: 4px;
     margin-top: 10px;
-    order: 3; 
+    order: 3;
 }
+
 .book-card a:first-of-type:hover {
     background-color: #007bff;
     color: white;
 }
 
-/* Nút Thêm vào Giỏ */
 .book-card a:nth-of-type(2) {
     display: block;
     text-align: center;
@@ -310,6 +311,7 @@ nav ul li {
     margin-top: 5px;
     order: 4;
 }
+
 .book-card button[disabled] {
     display: block;
     width: 100%;
@@ -322,88 +324,90 @@ nav ul li {
     margin-top: 5px;
 }
 
-
 /* ==========================================================
- * TRANG CHI TIẾT SÁCH (book_detail.html)
- * Sử dụng móc nối .book-detail-wrapper
+ * BOOK DETAIL, USER DASHBOARD, ADMIN DASHBOARD...
+ * (Mình sẽ tiếp tục theo cùng format: mỗi selector 1 block, mỗi thuộc tính 1 dòng)
  * ========================================================== */
 
-/* ==========================================================
+ /* ==========================================================
  * TRANG CHI TIẾT SÁCH (book_detail.html)
  * ========================================================== */
 
 /* Bố cục 2 cột chính dùng Flexbox */
 .book-detail-wrapper {
     display: flex;
-    gap: 30px; /* Khoảng cách giữa 2 cột: Ảnh và Thông tin */
+    gap: 30px;
     margin-top: 30px;
     background-color: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
 }
 
-/* Cột Ảnh: Cố định chiều rộng (300px) */
+/* Cột Ảnh */
 .book-image-col {
-    flex: 0 0 300px; 
+    flex: 0 0 300px;
 }
-/* Cột Thông tin: Chiếm hết phần không gian còn lại */
+
+/* Cột Thông tin */
 .book-info-col {
     flex: 1;
 }
 
-/* Định dạng Hình ảnh Sách (Quan trọng: Đảm bảo kích thước chuẩn) */
+/* Định dạng hình ảnh sách */
 .detail-book-img {
     width: 100%;
-    /* Đặt chiều cao cố định để tất cả ảnh đều bằng nhau (giống như thumbnail) */
-    height: 350px; 
-    object-fit: cover; /* Cắt ảnh để vừa khung mà không bị méo */
+    height: 350px;
+    object-fit: cover;
     border-radius: 8px;
-    /* Hiệu ứng nổi bật cho ảnh */
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
 
-/* Định dạng Bảng thông tin chi tiết */
+/* Bảng thông tin chi tiết */
 .detail-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    font-size: 0.95em; /* Giảm cỡ chữ cho bảng */
+    font-size: 0.95em;
 }
-.detail-table th, .detail-table td {
+
+.detail-table th,
+.detail-table td {
     border: 1px solid #dee2e6;
     padding: 12px;
     text-align: left;
 }
+
 .detail-table th {
-    background-color: #f8f9fa; /* Nền xám nhạt cho tiêu đề cột */
-    width: 30%; /* Cố định chiều rộng cột tiêu đề (Tác giả, Thể loại,...) */
+    background-color: #f8f9fa;
+    width: 30%;
     font-weight: 600;
 }
-/* Tạo hiệu ứng sọc ngang cho bảng (zebra-striping) */
+
 .detail-table tr:nth-child(odd) td {
     background-color: #f2f2f2;
 }
 
-/* Định dạng tiêu đề mô tả */
+/* Tiêu đề mô tả */
 .book-info-col h4 {
-    margin-top: 25px; 
+    margin-top: 25px;
     margin-bottom: 10px;
     color: #333;
 }
-/* Định dạng phần Mô tả sách */
+
+/* Phần mô tả sách */
 .book-info-col p {
-    line-height: 1.7; /* Tăng khoảng cách dòng cho dễ đọc */
+    line-height: 1.7;
     color: #555;
 }
 
-/* Nút Hành động (Thêm vào Giỏ / Mượn ngay) */
+/* Nút hành động */
 .book-info-col a {
-    margin-right: 15px; /* Khoảng cách giữa các nút */
+    margin-right: 15px;
     margin-top: 15px;
 }
-/* Định dạng chung cho tất cả các nút (để dễ dàng thay thế class .btn-primary) */
-.book-info-col .btn-action { 
+
+.book-info-col .btn-action {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -413,11 +417,12 @@ nav ul li {
     display: inline-block;
     transition: background-color 0.2s;
 }
+
 .book-info-col .btn-action:hover {
     background-color: #0056b3;
 }
 
-/* Định dạng cho nút Hết Sách */
+/* Nút hết sách */
 .book-info-col button[disabled] {
     background-color: #6c757d;
     color: white;
@@ -429,16 +434,13 @@ nav ul li {
     font-weight: bold;
 }
 
-/*====ĐỊNH DẠNG NÚT QUAY LẠI TRANG CHỦ==== */
-/* ==========================================================
- * ĐỊNH DẠNG NÚT QUAY LẠI TRANG CHỦ
- * ========================================================== */
+/* Nút quay lại trang chủ */
 .btn-back {
-    display: inline-block; /* Quan trọng: để áp dụng padding */
-    margin-top: 15px;      /* Tạo khoảng cách với tiêu đề */
-    margin-bottom: 20px;   /* Tạo khoảng cách với khối nội dung chính */
+    display: inline-block;
+    margin-top: 15px;
+    margin-bottom: 20px;
     padding: 8px 15px;
-    background-color: #00acf0; /* Màu xám trung tính */
+    background-color: #00acf0;
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -450,65 +452,160 @@ nav ul li {
     background-color: #007596;
 }
 
-/* ==========================================================
- * TRANG USER DASHBOARD (user_dashboard.html)
- * ========================================================== */
-
+/* ==========================
+   DASHBOARD HEADER
+========================== */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    padding: 20px 25px;
+    border-radius: 12px;
+    background-color: #00b4d8;
+    color: white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-/* Định dạng Giỏ hàng (Cart) và Sách đang mượn (Borrowed) */
-.user-dashboard-section {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    margin-bottom: 20px;
+.user-info h1 {
+    font-size: 1.9rem;
+    margin: 0;
 }
 
-/* Danh sách sách mượn/giỏ hàng */
-.user-dashboard-section ul {
+.user-info .username {
+    font-weight: 700;
+}
+
+.user-info p {
+    margin: 5px 0 0;
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+.logout-btn {
+    text-decoration: none;
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: rgba(255,255,255,0.35);
+    transform: translateY(-2px);
+}
+
+/* ==========================
+   CART CONTAINER
+========================== */
+.cart-container {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.cart-container h2 {
+    font-size: 1.8rem;
+    color: #0077b6;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Cart list */
+.cart-container ul {
     list-style: none;
     padding: 0;
-    margin: 0 0 100px 0;
+    margin: 0 0 20px 0;
 }
-.user-dashboard-section li {
+
+.cart-container li {
     display: flex;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    background-color: #f1f5f9;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.25s ease;
 }
 
-/* ĐỊNH DẠNG CHUNG cho tất cả ảnh trong LI (Giữ lại border-radius & box-shadow) */
-.user-dashboard-section li img {
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.cart-container li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-/* Định dạng ảnh Giỏ hàng/Đang mượn (Dùng class để thiết lập kích thước & margin) */
 .cart-book-img {
-    width: 50px;
-    height: 70px;
+    width: 60px;
+    height: 90px;
     object-fit: cover;
-    margin-right: 10px; /* Đã sửa: giá trị mong muốn được áp dụng */
+    border-radius: 8px;
+    margin-right: 15px;
     flex-shrink: 0;
 }
 
-.user-dashboard-section li div:nth-child(2) {
-    flex-grow: 1;
+.cart-container li div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
+.cart-container li p:first-child {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0;
+    color: #023e8a;
+}
+
+.cart-container li p:last-child {
+    font-size: 0.9rem;
+    margin: 3px 0 0 0;
+    color: #6c757d;
+}
+
+/* Checkout button */
+.cart-container a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px 0;
+    background: linear-gradient(90deg, #007f5f, #2b9348);
+    color: white;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.cart-container a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Empty cart */
+.cart-container p {
+    text-align: center;
+    font-size: 1.05rem;
+    color: #6c757d;
+    padding: 25px 0;
+    font-style: italic;
+}
+
+
+
+
+
 /* ==========================================================
- * QUY TẮC CHUNG CHO NÚT HÀNH ĐỘNG CHÍNH (PRIMARY/SUCCESS)
- * **ĐÃ GỘP MÀU SẮC** cho Checkout và Thêm vào Giỏ hàng
+ * NÚT HÀNH ĐỘNG CHÍNH
  * ========================================================== */
 
-/* Định dạng chung: Màu nền, màu chữ và transition */
-[href*="checkout"], .add-to-cart-btn {
+[href*="checkout"],
+.add-to-cart-btn {
     background-color: #2facff;
     color: white;
     text-decoration: none;
@@ -517,11 +614,11 @@ nav ul li {
     transition: background-color 0.2s ease-in-out;
 }
 
-[href*="checkout"]:hover, .add-to-cart-btn:hover {
+[href*="checkout"]:hover,
+.add-to-cart-btn:hover {
     background-color: #1e7e34;
 }
 
-/* Nút Checkout (Xác nhận Mượn) - Quy tắc cụ thể */
 [href*="checkout"] {
     display: block;
     text-align: center;
@@ -530,35 +627,74 @@ nav ul li {
     font-size: 1.2rem;
 }
 
-/* Nút Trả Sách - (Action phụ) */
 .user-dashboard-section li a {
     padding: 8px 15px;
-    /* transition đã được gộp ở trên */
     white-space: nowrap;
 }
+
 [href*="return-book"] {
-    background-color: #ffc107; /* Màu warning */
+    background-color: #ffc107;
     color: #333;
     border: 1px solid #ffc107;
 }
+
 [href*="return-book"]:hover {
     background-color: #e0a800;
 }
+/*user.infor===*/
+.user-info {
+    background-color: #ffffff;        /* Nền trắng sang trọng */
+    padding: 25px 30px;               /* Khoảng cách xung quanh */
+    border-radius: 12px;              /* Bo tròn góc */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bóng nhẹ nổi */
+    max-width: 500px;                 /* Giới hạn chiều ngang */
+    margin: 30px auto;                /* Căn giữa trang */
+    text-align: center;               /* Căn giữa chữ */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.user-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.user-info h1 {
+    font-size: 2rem;
+    color: #007bff;                    /* Màu xanh chủ đạo */
+    margin-bottom: 10px;
+}
+
+.user-info .username {
+    font-weight: bold;
+    color: #17a2b8;                    /* Màu accent khác cho tên */
+}
+
+.user-info p {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0;
+}
+
+.user-info .points {
+    font-weight: bold;
+    color: #28a745;                     /* Màu xanh lá cho điểm */
+    background-color: #e6f4ea;          /* Nền nhạt để nổi bật */
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
 
 /* ==========================================================
- * DANH SÁCH SÁCH CÓ SẴN (Phần dưới của user_dashboard.html)
+ * DANH SÁCH SÁCH CÓ SẴN
  * ========================================================== */
 
-/* Bố cục lưới cho danh sách sách có sẵn */
 .book-list-grid {
     display: grid;
-    /* Chia lưới tự động, mỗi ô rộng tối thiểu 250px */
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
-/* Định dạng từng thẻ sách */
 .book-card-item {
     background-color: white;
     padding: 15px;
@@ -569,7 +705,6 @@ nav ul li {
     flex-direction: column;
 }
 
-/* Định dạng ảnh bìa sách */
 .book-list-img {
     width: 100%;
     max-width: 120px;
@@ -579,48 +714,36 @@ nav ul li {
     margin: 0 auto 10px auto;
 }
 
-/* Đảm bảo nút ở dưới cùng */
 .book-card-item > div:last-child {
     margin-top: auto;
     padding-top: 10px;
 }
 
-/* ==========================================================
- * ĐỊNH DẠNG NÚT THÊM VÀO GIỎ HÀNG (TRONG DANH SÁCH SÁCH)
- * ========================================================== */
-
 .add-to-cart-btn {
-    /* Đảm bảo nút chiếm toàn bộ chiều rộng */
-    display: block; 
+    display: block;
     width: 100%;
-    
-    /* Màu sắc và hình thức */
-    background-color: #00cefc; /* Màu xanh sáng */
+    background-color: #00cefc;
     color: white;
-    /* CHỈNH SỬA: Bỏ padding ngang để tránh tràn (10px 0px thay vì 10px 15px) */
-    padding: 10px 0px; 
+    padding: 10px 0px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
     font-size: 1rem;
-    
-    /* Hiệu ứng chuyển động */
     transition: background-color 0.2s ease-in-out, transform 0.1s;
-    margin-top: 5px; 
+    margin-top: 5px;
     text-align: center;
 }
 
 .add-to-cart-btn:hover {
-    background-color: #6d91ff; 
+    background-color: #6d91ff;
     transform: translateY(-1px);
 }
 
-/* Định dạng Nút Hết Sách (Disabled) */
 .out-of-stock-btn {
     display: block;
     width: 100%;
     padding: 10px 15px;
-    background-color: #6c757d; /* Màu xám (Màu muted) */
+    background-color: #6c757d;
     color: white;
     border: none;
     border-radius: 6px;
@@ -631,14 +754,13 @@ nav ul li {
 
 /* ==========================================================
  * TRANG ADMIN DASHBOARD (admin_dashboard.html)
- * Sử dụng móc nối .admin-section
  * ========================================================== */
 
 .admin-section {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     margin-bottom: 20px;
 }
 
@@ -646,11 +768,10 @@ nav ul li {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex; /* Bố cục ngang cho thống kê */
+    display: flex;
     gap: 30px;
 }
 
-/* Form Add Book */
 .form-add-book > div {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -659,14 +780,13 @@ nav ul li {
 }
 
 .form-add-book input {
-    /* Kế thừa style .form-control */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
 .form-add-book button[type="submit"] {
-    /* Tái tạo nút Thêm sách (màu xanh lá) */
-    background-color: #55e6ff; 
+    background-color: #55e6ff;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -674,11 +794,11 @@ nav ul li {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+
 .form-add-book button[type="submit"]:hover {
-    background-color: #35f2ff; 
+    background-color: #35f2ff;
 }
 
-/* Table Management */
 .table-wrapper {
     overflow-x: auto;
 }
@@ -688,7 +808,8 @@ nav ul li {
     border-collapse: collapse;
 }
 
-.admin-section th, .admin-section td {
+.admin-section th,
+.admin-section td {
     border: 1px solid #dee2e6;
     padding: 10px;
     text-align: left;
@@ -704,15 +825,17 @@ nav ul li {
 }
 
 /* ==========================================================
- * THÔNG BÁO FLASH (Cần thêm vào style.css)
+ * THÔNG BÁO FLASH
  * ========================================================== */
+
 .flash-messages {
     max-width: 1200px;
     margin: 10px auto;
     padding: 0 15px;
 }
 
-.flash-success, .flash-error {
+.flash-success,
+.flash-error {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 4px;

@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
 <div>
-    <div>
-        <div>
-            <h1>Xin chào, {{ user.username }} 👋</h1>
-            <p>Điểm tích lũy: <span>{{ user.points }}</span></p>
+    <div class="dashboard-header">
+        <div class="user-info">
+            <h1>Xin chào, <span class="username">{{ user.username }}</span> 👋</h1>
+            <p>Điểm tích lũy: <span class="points">{{ user.points }}</span></p>
         </div>
-        <a href="{{ url_for('logout') }}">🚪 Đăng xuất</a>
+        <a class="logout-btn" href="{{ url_for('logout') }}">🚪 Đăng xuất</a> 
     </div>
 
-    <div>
+    <div class="cart-container">
         <h2>🛒 Giỏ Hàng Của Bạn ({{ cart|length }})</h2>
         
         {% if cart %}

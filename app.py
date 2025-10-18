@@ -112,9 +112,8 @@ class DatabaseManager:
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
                 books = [
-                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, '', 'Sách về kỹ năng giao tiếp'),
-                    ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, '', 'Lịch sử loài người'),
-                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, '', 'Viết code sạch')
+                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://i.pinimg.com/1200x/1c/22/df/1c22df7132ad8f1358688b23831e9eaf.jpg', 'Sách về kỹ năng giao tiếp'),
+                    ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, 'https://i.pinimg.com/1200x/ef/68/e5/ef68e5753d6bd53fbc099c9003ad1abb.jpg', 'Lịch sử loài người'),
                 ]
                 cursor.executemany('''
                     INSERT INTO books (title, author, category, year, quantity, available, image_url, description)
