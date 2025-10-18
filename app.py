@@ -67,6 +67,73 @@ class DatabaseManager:
             raise ConnectionError(f"Không thể kết nối PostgreSQL: {e}")
 
     def init_database(self):
+        """Tạo bảng và dữ liệu mẫu nếu chưa có"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+
+            # --- Tạo bảng ---
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    username VARCHAR(100) UNIQUE NOT NULL,
+                    password VARCHAR(100) NOT NULL,
+                    email VARCHAR(100),
+                    role VARCHAR(50) DEFAULT 'user',
+                    points INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS books (
+                    id SERIAL PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    author VARCHAR(255) NOT NULL,
+                    category VARCHAR(100) NOT NULL,
+                    year INTEGER,
+                    quantity INTEGER DEFAULT 1,
+                    available INTEGER DEFAULT 1,
+                    image_url TEXT,
+                    description TEXT,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            ''')
+
+            # --- Chèn dữ liệu mẫu nếu bảng trống ---
+            cursor.execute("SELECT COUNT(*) FROM users")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute('''
+                    INSERT INTO users (username, password, email, role, points)
+                    VALUES 
+                    ('admin', 'admin123', 'admin@library.com', 'admin', 0),
+                    ('user1', 'user123', 'user1@example.com', 'user', 50)
+                ''')
+
+            cursor.execute("SELECT COUNT(*) FROM books")
+            if cursor.fetchone()[0] == 0:
+                books = [
+                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, '', 'Sách về kỹ năng giao tiếp'),
+                    ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, '', 'Lịch sử loài người'),
+                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, '', 'Viết code sạch')
+                ]
+                cursor.executemany('''
+                    INSERT INTO books (title, author, category, year, quantity, available, image_url, description)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ''', books)
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("[INFO] Database đã được đồng bộ thành công!")
+
+        except Exception as e:
+            print(f"[ERROR] Đồng bộ database thất bại: {e}")
+            if conn:
+                conn.rollback()
+                conn.close()
+
+
+    def init_database(self):
         """Khởi tạo các bảng và sample data nếu cần"""
         try:
             with self.get_connection() as conn:
