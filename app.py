@@ -18,10 +18,25 @@ app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
 # PHẦN 1: CÁC CLASS OOP
 # ============================================
 
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+import os
+import psycopg2
+from psycopg2 import errors
+from datetime import datetime, timedelta
+from abc import ABC, abstractmethod
+from functools import wraps
+
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
+
+# ============================================
+# PHẦN 1: CÁC CLASS OOP
+# ============================================
+
 class DatabaseManager:
-    """Class quản lý database PostgreSQL"""
+    """Class quản lý database PostgreSQL (local và Render)"""
     
-    # KHAI BÁO CỤC BỘ DỰ PHÒNG CHO CHẾ ĐỘ LOCAL
+    # Cấu hình local (chỉ dùng khi chạy local)
     LOCAL_DB_CONFIG = {
         'dbname': "library_db",
         'user': "admin",
@@ -31,103 +46,99 @@ class DatabaseManager:
     }
 
     def __init__(self):
-        # Lấy chuỗi kết nối đã khai báo ở đầu file (DATABASE_URL)
+        # Lấy DATABASE_URL từ Render (hoặc local nếu chưa có)
         self.DATABASE_URL = os.environ.get('DATABASE_URL')
-        if not self.DATABASE_URL:
-            print("CẢNH BÁO: Không tìm thấy DATABASE_URL. Đang sử dụng cấu hình cục bộ.")
+        if self.DATABASE_URL:
+            print(f"[INFO] Kết nối tới Render PostgreSQL: {self.DATABASE_URL}")
+        else:
+            print(f"[WARNING] Không tìm thấy DATABASE_URL. Đang dùng cấu hình local.")
         self.init_database()
 
     def get_connection(self):
-        """Tạo kết nối database PostgreSQL"""
+        """Tạo connection đến PostgreSQL"""
         try:
             if self.DATABASE_URL:
-                # Sử dụng chuỗi kết nối trực tuyến (cho Render)
                 conn = psycopg2.connect(self.DATABASE_URL)
             else:
-                # Sử dụng thông số cục bộ (chỉ khi chạy local và không có env var)
                 conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)
-            
             return conn
         except psycopg2.Error as e:
-            print(f"LỖI KẾT NỐI POSTGRESQL: {e}")
-            raise ConnectionError(f"Không thể kết nối PostgreSQL. Lỗi: {e}")
-    
-    def init_database(self):
-        """Khởi tạo các bảng trong database"""
-        conn = None
-        try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            
-            # Bảng USERS
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS users (
-                    id SERIAL PRIMARY KEY,
-                    username VARCHAR(100) UNIQUE NOT NULL,
-                    password VARCHAR(100) NOT NULL,
-                    email VARCHAR(100),
-                    role VARCHAR(50) DEFAULT 'user',
-                    points INTEGER DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT NOW()
-                )
-            ''')
-            
-            # Bảng BOOKS
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS books (
-                    id SERIAL PRIMARY KEY,
-                    title VARCHAR(255) NOT NULL,
-                    author VARCHAR(255) NOT NULL,
-                    category VARCHAR(100) NOT NULL,
-                    year INTEGER,
-                    quantity INTEGER DEFAULT 1,
-                    available INTEGER DEFAULT 1,
-                    image_url TEXT,
-                    description TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
-                )
-            ''')
-            
-            # Bảng CART
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS cart (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-                    added_at TIMESTAMP DEFAULT NOW(),
-                    UNIQUE (user_id, book_id)
-                )
-            ''')
-            
-            # Bảng TRANSACTIONS
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS transactions (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER NOT NULL REFERENCES users(id),
-                    book_id INTEGER NOT NULL REFERENCES books(id),
-                    borrow_date TIMESTAMP DEFAULT NOW(),
-                    due_date DATE NOT NULL,
-                    return_date TIMESTAMP,
-                    status VARCHAR(50) DEFAULT 'borrowed',
-                    points_earned INTEGER DEFAULT 0
-                )
-            ''')
-            
-            conn.commit()
-            self.create_sample_data(cursor)
-            
-        except psycopg2.Error as e:
-            print(f"LỖI KHỞI TẠO BẢNG: {e}")
-            if conn:
-                conn.rollback()
-        finally:
-            if conn:
-                conn.close()
+            print(f"[ERROR] Kết nối PostgreSQL thất bại: {e}")
+            raise ConnectionError(f"Không thể kết nối PostgreSQL: {e}")
 
-    def create_sample_data(self, cursor):
-        """Tạo dữ liệu mẫu"""
+    def init_database(self):
+        """Khởi tạo các bảng và sample data nếu cần"""
         try:
-            # Kiểm tra đã có user chưa
+            with self.get_connection() as conn:
+                with conn.cursor() as cursor:
+                    # Bảng USERS
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS users (
+                            id SERIAL PRIMARY KEY,
+                            username VARCHAR(100) UNIQUE NOT NULL,
+                            password VARCHAR(100) NOT NULL,
+                            email VARCHAR(100),
+                            role VARCHAR(50) DEFAULT 'user',
+                            points INTEGER DEFAULT 0,
+                            created_at TIMESTAMP DEFAULT NOW()
+                        )
+                    ''')
+
+                    # Bảng BOOKS
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS books (
+                            id SERIAL PRIMARY KEY,
+                            title VARCHAR(255) NOT NULL,
+                            author VARCHAR(255) NOT NULL,
+                            category VARCHAR(100) NOT NULL,
+                            year INTEGER,
+                            quantity INTEGER DEFAULT 1,
+                            available INTEGER DEFAULT 1,
+                            image_url TEXT,
+                            description TEXT,
+                            created_at TIMESTAMP DEFAULT NOW()
+                        )
+                    ''')
+
+                    # Bảng CART
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS cart (
+                            id SERIAL PRIMARY KEY,
+                            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                            book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                            added_at TIMESTAMP DEFAULT NOW(),
+                            UNIQUE (user_id, book_id)
+                        )
+                    ''')
+
+                    # Bảng TRANSACTIONS
+                    cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS transactions (
+                            id SERIAL PRIMARY KEY,
+                            user_id INTEGER NOT NULL REFERENCES users(id),
+                            book_id INTEGER NOT NULL REFERENCES books(id),
+                            borrow_date TIMESTAMP DEFAULT NOW(),
+                            due_date DATE NOT NULL,
+                            return_date TIMESTAMP,
+                            status VARCHAR(50) DEFAULT 'borrowed',
+                            points_earned INTEGER DEFAULT 0
+                        )
+                    ''')
+
+                    # Commit tạo bảng
+                    conn.commit()
+
+                    # Tạo dữ liệu mẫu nếu bảng rỗng
+                    self.create_sample_data(cursor, conn)
+
+                    print("[INFO] Database và bảng đã sẵn sàng.")
+        except psycopg2.Error as e:
+            print(f"[ERROR] Khởi tạo database thất bại: {e}")
+
+    def create_sample_data(self, cursor, conn):
+        """Tạo dữ liệu mẫu nếu bảng trống"""
+        try:
+            # USERS
             cursor.execute("SELECT COUNT(*) FROM users")
             if cursor.fetchone()[0] == 0:
                 cursor.execute('''
@@ -136,26 +147,28 @@ class DatabaseManager:
                     ('admin', 'admin123', 'admin@library.com', 'admin', 0),
                     ('user1', 'user123', 'user1@example.com', 'user', 50)
                 ''')
-            
-            # Kiểm tra đã có sách chưa
+
+            # BOOKS
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
                 books = [
-                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://i.pinimg.com/1200x/8f/3e/6a/8f3e6a6fb0a7061091bd19c3f9731132.jpg', 'Sách về kỹ năng giao tiếp'),
+                    ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://i.pinimg.com/1200x/1c/22/df/1c22df7132ad8f1358688b23831e9eaf.jpg', 'Sách về kỹ năng giao tiếp'),
                     ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, 'https://salt.tikicdn.com/cache/750x750/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg.webp', 'Lịch sử loài người'),
-                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH7Nf18r0Cl3J4krqX9d0RwpYTwEegGjPV1g&s', 'Viết code sạch'),
+                    ('Clean Code', 'Robert C. Martin', 'Công nghệ', 2019, 4, 4, 'https://m.media-amazon.com/images/I/51E2055ZGUL._SY445_SX342_.jpg', 'Viết code sạch'),
                     ('Hoàng Tử Bé', 'Antoine de Saint-Exupéry', 'Văn học', 2015, 6, 6, 'https://i.pinimg.com/736x/73/fe/f2/73fef2d17b9f311e713bee4bcba584d7.jpg', 'Truyện thiếu nhi'),
                     ('Nhà Giả Kim', 'Paulo Coelho', 'Văn học', 2017, 5, 5, 'https://i.pinimg.com/736x/e7/9b/61/e79b615c3277569a59e312943707eeae.jpg', 'Tiểu thuyết triết lý')
                 ]
-                
                 cursor.executemany('''
                     INSERT INTO books (title, author, category, year, quantity, available, image_url, description)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''', books)
-            
-            cursor.connection.commit()
+
+            conn.commit()
+            print("[INFO] Sample data đã được thêm (nếu bảng rỗng).")
+
         except Exception as e:
-            print(f"Lỗi tạo dữ liệu mẫu: {e}")
+            print(f"[ERROR] Tạo dữ liệu mẫu thất bại: {e}")
+
 
 
 class Person(ABC):
