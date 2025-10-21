@@ -1,0 +1,51 @@
+{% extends "layout.html" %}  {# hoặc index.html nếu bạn chưa tách layout #}
+
+{% block title %}Tìm kiếm sách{% endblock %}
+
+{% block content %}
+<!-- Gọi riêng CSS cho search -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+
+<div class="search-container">
+  <h2 class="search-title">🔍 Tìm kiếm sách</h2>
+
+  <form method="POST" class="search-form">
+    <input 
+      type="text" 
+      name="query" 
+      class="search-input" 
+      placeholder="Nhập tên sách, tác giả hoặc năm xuất bản..." 
+      value="{{ query }}"
+      required>
+    <button class="search-button" type="submit">Tìm</button>
+  </form>
+
+  {% if results %}
+  <table class="search-table">
+    <thead>
+      <tr>
+        <th>Tên sách</th>
+        <th>Tác giả</th>
+        <th>Năm</th>
+        <th>Số lượng còn</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in results %}
+      <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.year }}</td>
+        <td>{{ book.available }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% elif query %}
+  <p class="no-result">
+    Không tìm thấy sách nào phù hợp với từ khóa 
+    "<strong>{{ query }}</strong>".
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

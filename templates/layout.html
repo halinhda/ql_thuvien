@@ -15,8 +15,7 @@
             <a href="{{ url_for('index') }}">
                 Thư Viện
             </a>
-            
-            <div>
+        
                 <ul>
                     <li>
                         <a href="{{ url_for('index') }}">Trang Chủ</a>
@@ -43,10 +42,11 @@
                         <li>
                             <a href="{{ url_for('register') }}">Đăng Ký</a>
                         </li>
+                        <li>
+                            <a href="{{ url_for('search_books') }}">Tìm Kiếm Sách</a>
+                        </li>
                     {% endif %}
                 </ul>
-
-            </div>
         </div>
     </nav>
 

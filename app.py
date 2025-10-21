@@ -2,17 +2,20 @@
 # FILE: app.py - BACKEND FLASK + OOP (PostgreSQL) - PHIÊN BẢN ĐÃ SỬA LỖI URL
 # ============================================
 
+# IMPORT CÁC THƯ VIỆN CẦN THIẾT
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import os
-DATABASE_URL = os.environ.get('DATABASE_URL')
-import psycopg2 
-from psycopg2 import errors
-from datetime import datetime, timedelta
-from abc import ABC, abstractmethod
-from functools import wraps
+DATABASE_URL = os.environ.get('DATABASE_URL')  # Lấy URL database từ biến môi trường (dùng khi deploy)
+import psycopg2  # Thư viện kết nối PostgreSQL
+import psycopg2.extras  # Thư viện hỗ trợ thao tác nâng cao với PostgreSQL
+from psycopg2 import errors  # Import các lỗi của PostgreSQL
+from datetime import datetime, timedelta  # Xử lý ngày tháng
+from abc import ABC, abstractmethod  # Tạo class trừu tượng (Abstract Base Class)
+from functools import wraps  # Dùng để tạo decorator
 
+# KHỞI TẠO ỨNG DỤNG FLASK
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
+app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')  # Khóa bí mật cho session
 
 # ============================================
 # PHẦN 1: CÁC CLASS OOP
@@ -34,74 +37,90 @@ app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
 # ============================================
 
 class DatabaseManager:
-    """Class quản lý database PostgreSQL (local và Render)"""
+    """
+    CLASS QUẢN LÝ DATABASE POSTGRESQL
+    - Kết nối với database (local hoặc Render)
+    - Tạo bảng và dữ liệu mẫu
+    - Cung cấp connection để các class khác sử dụng
+    """
     
-    # Cấu hình local (chỉ dùng khi chạy local)
+    # CÁC THÔNG SỐ KẾT NỐI DATABASE LOCAL (dùng khi chạy trên máy tính)
     LOCAL_DB_CONFIG = {
-        'dbname': "library_db",
-        'user': "admin",
-        'password': "1234",
-        'host': "localhost",
-        'port': "5432"
+        'dbname': "library_db",      # Tên database
+        'user': "admin",             # Tên user
+        'password': "1234",          # Mật khẩu
+        'host': "localhost",         # Địa chỉ máy chủ
+        'port': "5432"               # Cổng kết nối
     }
 
     def __init__(self):
+        """KHỞI TẠO: Lấy URL database và tạo các bảng nếu chưa có"""
         # Lấy DATABASE_URL từ Render (hoặc local nếu chưa có)
         self.DATABASE_URL = os.environ.get('DATABASE_URL')
         if self.DATABASE_URL:
             print(f"[INFO] Kết nối tới Render PostgreSQL: {self.DATABASE_URL}")
         else:
             print(f"[WARNING] Không tìm thấy DATABASE_URL. Đang dùng cấu hình local.")
-        self.init_database()
+        self.init_database()  # Gọi hàm khởi tạo database
 
     def get_connection(self):
-        """Tạo connection đến PostgreSQL"""
+        """
+        TẠO KẾT NỐI ĐÉN POSTGRESQL
+        - Nếu có DATABASE_URL: dùng URL từ Render
+        - Nếu không: dùng cấu hình local
+        """
         try:
             if self.DATABASE_URL:
-                conn = psycopg2.connect(self.DATABASE_URL)
+                conn = psycopg2.connect(self.DATABASE_URL)  # Kết nối qua URL
             else:
-                conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)
+                conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)  # Kết nối qua config
             return conn
         except psycopg2.Error as e:
             print(f"[ERROR] Kết nối PostgreSQL thất bại: {e}")
             raise ConnectionError(f"Không thể kết nối PostgreSQL: {e}")
 
     def init_database(self):
-        """Tạo bảng và dữ liệu mẫu nếu chưa có"""
+        """
+        KHỞI TẠO DATABASE: Tạo các bảng và dữ liệu mẫu nếu chưa có
+        """
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
 
-            # --- Tạo bảng ---
+            # --- TẠO BẢNG USERS (Người dùng) ---
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
-                    id SERIAL PRIMARY KEY,
-                    username VARCHAR(100) UNIQUE NOT NULL,
-                    password VARCHAR(100) NOT NULL,
-                    email VARCHAR(100),
-                    role VARCHAR(50) DEFAULT 'user',
-                    points INTEGER DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT NOW()
+                    id SERIAL PRIMARY KEY,                 -- ID tự động tăng
+                    username VARCHAR(100) UNIQUE NOT NULL, -- Tên đăng nhập (duy nhất)
+                    password VARCHAR(100) NOT NULL,        -- Mật khẩu
+                    email VARCHAR(100),                    -- Email
+                    role VARCHAR(50) DEFAULT 'user',       -- Vai trò: 'user' hoặc 'admin'
+                    points INTEGER DEFAULT 0,              -- Điểm tích lũy
+                    created_at TIMESTAMP DEFAULT NOW()     -- Ngày tạo tài khoản
                 )
             ''')
+            
+            # --- TẠO BẢNG BOOKS (Sách) ---
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS books (
-                    id SERIAL PRIMARY KEY,
-                    title VARCHAR(255) NOT NULL,
-                    author VARCHAR(255) NOT NULL,
-                    category VARCHAR(100) NOT NULL,
-                    year INTEGER,
-                    quantity INTEGER DEFAULT 1,
-                    available INTEGER DEFAULT 1,
-                    image_url TEXT,
-                    description TEXT,
-                    created_at TIMESTAMP DEFAULT NOW()
+                    id SERIAL PRIMARY KEY,              -- ID sách
+                    title VARCHAR(255) NOT NULL,        -- Tên sách
+                    author VARCHAR(255) NOT NULL,       -- Tác giả
+                    category VARCHAR(100) NOT NULL,     -- Thể loại
+                    year INTEGER,                       -- Năm xuất bản
+                    quantity INTEGER DEFAULT 1,         -- Tổng số lượng
+                    available INTEGER DEFAULT 1,        -- Số lượng có sẵn để mượn
+                    image_url TEXT,                     -- Link ảnh bìa
+                    description TEXT,                   -- Mô tả sách
+                    created_at TIMESTAMP DEFAULT NOW()  -- Ngày thêm sách
                 )
             ''')
 
-            # --- Chèn dữ liệu mẫu nếu bảng trống ---
+            # --- CHÈN DỮ LIỆU MẪU NẾU BẢNG TRỐNG ---
+            # Kiểm tra xem bảng users có dữ liệu chưa
             cursor.execute("SELECT COUNT(*) FROM users")
             if cursor.fetchone()[0] == 0:
+                # Thêm tài khoản mẫu: 1 admin và 1 user
                 cursor.execute('''
                     INSERT INTO users (username, password, email, role, points)
                     VALUES 
@@ -109,8 +128,10 @@ class DatabaseManager:
                     ('user1', 'user123', 'user1@example.com', 'user', 50)
                 ''')
 
+            # Kiểm tra xem bảng books có dữ liệu chưa
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
+                # Thêm sách mẫu
                 books = [
                     ('Đắc Nhân Tâm', 'Dale Carnegie', 'Kỹ năng sống', 2020, 5, 5, 'https://i.pinimg.com/1200x/1c/22/df/1c22df7132ad8f1358688b23831e9eaf.jpg', 'Sách về kỹ năng giao tiếp'),
                     ('Sapiens', 'Yuval Noah Harari', 'Lịch sử', 2018, 3, 3, 'https://i.pinimg.com/1200x/ef/68/e5/ef68e5753d6bd53fbc099c9003ad1abb.jpg', 'Lịch sử loài người'),
@@ -120,7 +141,7 @@ class DatabaseManager:
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''', books)
 
-            conn.commit()
+            conn.commit()  # Lưu tất cả thay đổi vào database
             cursor.close()
             conn.close()
             print("[INFO] Database đã được đồng bộ thành công!")
@@ -128,16 +149,19 @@ class DatabaseManager:
         except Exception as e:
             print(f"[ERROR] Đồng bộ database thất bại: {e}")
             if conn:
-                conn.rollback()
+                conn.rollback()  # Hoàn tác nếu có lỗi
                 conn.close()
 
 
     def init_database(self):
-        """Khởi tạo các bảng và sample data nếu cần"""
+        """
+        KHỞI TẠO CÁC BẢNG VÀ DỮ LIỆU MẪU
+        - Tạo 4 bảng: users, books, cart, transactions
+        """
         try:
             with self.get_connection() as conn:
                 with conn.cursor() as cursor:
-                    # Bảng USERS
+                    # --- BẢNG USERS (Người dùng) ---
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS users (
                             id SERIAL PRIMARY KEY,
@@ -150,7 +174,7 @@ class DatabaseManager:
                         )
                     ''')
 
-                    # Bảng BOOKS
+                    # --- BẢNG BOOKS (Sách) ---
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS books (
                             id SERIAL PRIMARY KEY,
@@ -166,35 +190,35 @@ class DatabaseManager:
                         )
                     ''')
 
-                    # Bảng CART
+                    # --- BẢNG CART (Giỏ sách - sách user định mượn) ---
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS cart (
                             id SERIAL PRIMARY KEY,
-                            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                            book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-                            added_at TIMESTAMP DEFAULT NOW(),
-                            UNIQUE (user_id, book_id)
+                            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,  -- Khóa ngoại đến users
+                            book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,  -- Khóa ngoại đến books
+                            added_at TIMESTAMP DEFAULT NOW(),                                 -- Thời gian thêm vào giỏ
+                            UNIQUE (user_id, book_id)  -- 1 user không thể thêm 1 sách 2 lần
                         )
                     ''')
 
-                    # Bảng TRANSACTIONS
+                    # --- BẢNG TRANSACTIONS (Lịch sử mượn trả) ---
                     cursor.execute('''
                         CREATE TABLE IF NOT EXISTS transactions (
                             id SERIAL PRIMARY KEY,
-                            user_id INTEGER NOT NULL REFERENCES users(id),
-                            book_id INTEGER NOT NULL REFERENCES books(id),
-                            borrow_date TIMESTAMP DEFAULT NOW(),
-                            due_date DATE NOT NULL,
-                            return_date TIMESTAMP,
-                            status VARCHAR(50) DEFAULT 'borrowed',
-                            points_earned INTEGER DEFAULT 0
+                            user_id INTEGER NOT NULL REFERENCES users(id),      -- User nào mượn
+                            book_id INTEGER NOT NULL REFERENCES books(id),      -- Sách nào
+                            borrow_date TIMESTAMP DEFAULT NOW(),                -- Ngày mượn
+                            due_date DATE NOT NULL,                             -- Ngày phải trả
+                            return_date TIMESTAMP,                              -- Ngày trả thực tế (NULL nếu chưa trả)
+                            status VARCHAR(50) DEFAULT 'borrowed',              -- Trạng thái: 'borrowed' hoặc 'returned'
+                            points_earned INTEGER DEFAULT 0                     -- Điểm nhận được khi trả
                         )
                     ''')
 
-                    # Commit tạo bảng
+                    # Lưu thay đổi sau khi tạo bảng
                     conn.commit()
 
-                    # Tạo dữ liệu mẫu nếu bảng rỗng
+                    # Tạo dữ liệu mẫu
                     self.create_sample_data(cursor, conn)
 
                     print("[INFO] Database và bảng đã sẵn sàng.")
@@ -202,9 +226,11 @@ class DatabaseManager:
             print(f"[ERROR] Khởi tạo database thất bại: {e}")
 
     def create_sample_data(self, cursor, conn):
-        """Tạo dữ liệu mẫu nếu bảng trống"""
+        """
+        TẠO DỮ LIỆU MẪU CHO BẢNG USERS VÀ BOOKS (nếu bảng trống)
+        """
         try:
-            # USERS
+            # --- THÊM DỮ LIỆU CHO BẢNG USERS ---
             cursor.execute("SELECT COUNT(*) FROM users")
             if cursor.fetchone()[0] == 0:
                 cursor.execute('''
@@ -214,7 +240,7 @@ class DatabaseManager:
                     ('user1', 'user123', 'user1@example.com', 'user', 50)
                 ''')
 
-            # BOOKS
+            # --- THÊM DỮ LIỆU CHO BẢNG BOOKS ---
             cursor.execute("SELECT COUNT(*) FROM books")
             if cursor.fetchone()[0] == 0:
                 books = [
@@ -238,20 +264,31 @@ class DatabaseManager:
 
 
 class Person(ABC):
-    """Class trừu tượng - ABSTRACTION"""
+    """
+    CLASS TRỪU TƯỢNG (ABSTRACT CLASS) - ĐẠI DIỆN CHO MỘT NGƯỜI DÙNG
+    - Đây là class cha, không thể tạo đối tượng trực tiếp
+    - Các class con (User, Admin) phải kế thừa và implement method get_permissions()
+    """
     
     def __init__(self, user_id, username, email, role, points=0):
-        self.user_id = user_id
-        self.username = username
-        self.email = email
-        self.role = role
-        self.points = points
+        """KHỞI TẠO: Lưu thông tin cơ bản của người dùng"""
+        self.user_id = user_id      # ID người dùng
+        self.username = username    # Tên đăng nhập
+        self.email = email          # Email
+        self.role = role            # Vai trò: 'user' hoặc 'admin'
+        self.points = points        # Điểm tích lũy
     
     @abstractmethod
     def get_permissions(self):
+        """
+        METHOD TRỪU TƯỢNG: Mỗi class con phải tự định nghĩa quyền hạn
+        - User: chỉ được mượn/trả sách
+        - Admin: toàn quyền
+        """
         pass
     
     def get_info(self):
+        """TRẢ VỀ THÔNG TIN CƠ BẢN CỦA NGƯỜI DÙNG dưới dạng dictionary"""
         return {
             'id': self.user_id,
             'username': self.username,
@@ -262,28 +299,41 @@ class Person(ABC):
 
 
 class User(Person):
-    """Người dùng - INHERITANCE & POLYMORPHISM"""
+    """
+    CLASS USER (NGƯỜI DÙNG THÔNG THƯỜNG)
+    - Kế thừa từ Person
+    - Có quyền: xem sách, thêm vào giỏ, mượn, trả sách
+    """
     
     def __init__(self, user_id, username, email, points=0):
+        """KHỞI TẠO: Gọi constructor của class cha với role='user'"""
         super().__init__(user_id, username, email, 'user', points)
-        self.db = DatabaseManager()
+        self.db = DatabaseManager()  # Tạo kết nối database
     
     def get_permissions(self):
+        """QUYỀN HẠN CỦA USER: chỉ được browse và borrow sách"""
         return ['browse_books', 'borrow_books', 'return_books']
     
     def add_to_cart(self, book_id):
-        """ENCAPSULATION - Đóng gói logic thêm giỏ"""
+        """
+        THÊM SÁCH VÀO GIỎ
+        - Kiểm tra sách còn available không
+        - Kiểm tra sách đã có trong giỏ chưa
+        - Thêm vào bảng cart
+        """
         conn = None
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor()
             
+            # Kiểm tra sách còn available không
             cursor.execute("SELECT available FROM books WHERE id = %s", (book_id,))
             result = cursor.fetchone()
             
             if not result or result[0] <= 0:
                 return False, "Sách không có sẵn!"
             
+            # Kiểm tra sách đã có trong giỏ chưa
             cursor.execute('''
                 SELECT * FROM cart WHERE user_id = %s AND book_id = %s
             ''', (self.user_id, book_id))
@@ -291,6 +341,7 @@ class User(Person):
             if cursor.fetchone():
                 return False, "Sách đã có trong giỏ!"
             
+            # Thêm sách vào giỏ
             cursor.execute('''
                 INSERT INTO cart (user_id, book_id) VALUES (%s, %s)
             ''', (self.user_id, book_id))
@@ -306,6 +357,10 @@ class User(Person):
                 conn.close()
     
     def get_cart(self):
+        """
+        LẤY DANH SÁCH SÁCH TRONG GIỎ CỦA USER
+        - JOIN bảng cart với bảng books để lấy thông tin sách
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -321,30 +376,42 @@ class User(Person):
         return cart_items
     
     def checkout(self):
+        """
+        THANH TOÁN GIỎ HÀNG (MƯỢN TẤT CẢ SÁCH TRONG GIỎ)
+        - Lấy tất cả book_id trong giỏ
+        - Tạo transaction cho từng sách (thời hạn 14 ngày)
+        - Giảm available của sách
+        - Xóa giỏ hàng
+        """
         conn = None
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor()
             
+            # Lấy tất cả sách trong giỏ
             cursor.execute("SELECT book_id FROM cart WHERE user_id = %s", (self.user_id,))
             book_ids = [row[0] for row in cursor.fetchall()]
             
             if not book_ids:
                 return False, "Giỏ trống!"
             
+            # Tính ngày mượn và ngày phải trả (14 ngày sau)
             borrow_date = datetime.now()
             due_date = (borrow_date + timedelta(days=14)).date()
             
+            # Tạo transaction cho từng sách
             for book_id in book_ids:
                 cursor.execute('''
                     INSERT INTO transactions (user_id, book_id, due_date)
                     VALUES (%s, %s, %s)
                 ''', (self.user_id, book_id, due_date))
                 
+                # Giảm available của sách
                 cursor.execute('''
                     UPDATE books SET available = available - 1 WHERE id = %s
                 ''', (book_id,))
             
+            # Xóa giỏ hàng sau khi mượn
             cursor.execute("DELETE FROM cart WHERE user_id = %s", (self.user_id,))
             
             conn.commit()
@@ -358,6 +425,10 @@ class User(Person):
                 conn.close()
     
     def get_borrowed_books(self):
+        """
+        LẤY DANH SÁCH SÁCH ĐANG MƯỢN CỦA USER
+        - Chỉ lấy transaction có status = 'borrowed'
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -373,11 +444,20 @@ class User(Person):
         return borrowed
     
     def return_book(self, transaction_id):
+        """
+        TRẢ SÁCH
+        - Kiểm tra transaction có tồn tại và thuộc user này không
+        - Tính điểm: +20 nếu trả đúng hạn, +5 nếu trả trễ
+        - Cập nhật status = 'returned', lưu return_date
+        - Tăng available của sách
+        - Cộng điểm cho user
+        """
         conn = None
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor()
             
+            # Lấy thông tin transaction
             cursor.execute('''
                 SELECT book_id, due_date FROM transactions
                 WHERE id = %s AND user_id = %s AND status = 'borrowed'
@@ -389,17 +469,24 @@ class User(Person):
             
             book_id, due_date = result
             return_date = datetime.now()
+            
+            # Tính điểm: đúng hạn +20, trễ hạn +5
             points = 20 if return_date.date() <= due_date else 5
             
+            # Cập nhật transaction
             cursor.execute('''
                 UPDATE transactions
                 SET status = 'returned', return_date = %s, points_earned = %s
                 WHERE id = %s
             ''', (return_date, points, transaction_id))
             
+            # Tăng available của sách
             cursor.execute("UPDATE books SET available = available + 1 WHERE id = %s", (book_id,))
+            
+            # Cộng điểm cho user
             cursor.execute("UPDATE users SET points = points + %s WHERE id = %s", (points, self.user_id))
             
+            # Cập nhật points trong object
             self.points += points
             
             conn.commit()
@@ -414,16 +501,26 @@ class User(Person):
 
 
 class Admin(Person):
-    """Quản trị viên - INHERITANCE & POLYMORPHISM"""
+    """
+    CLASS ADMIN (QUẢN TRỊ VIÊN)
+    - Kế thừa từ Person
+    - Có toàn quyền: quản lý sách, xem thống kê, xem lịch sử
+    """
     
     def __init__(self, user_id, username, email, points=0):
+        """KHỞI TẠO: Gọi constructor của class cha với role='admin'"""
         super().__init__(user_id, username, email, 'admin', points)
         self.db = DatabaseManager()
     
     def get_permissions(self):
+        """QUYỀN HẠN CỦA ADMIN: toàn quyền"""
         return ['all']
     
     def add_book(self, title, author, category, year, quantity, image_url='', description=''):
+        """
+        THÊM SÁCH MỚI VÀO HỆ THỐNG
+        - available = quantity (sách mới thì tất cả đều available)
+        """
         conn = None
         try:
             conn = self.db.get_connection()
@@ -445,11 +542,17 @@ class Admin(Person):
                 conn.close()
     
     def delete_book(self, book_id):
+        """
+        XÓA SÁCH
+        - Kiểm tra sách có đang được mượn không (status='borrowed')
+        - Nếu không ai mượn thì mới được xóa
+        """
         conn = None
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor()
             
+            # Kiểm tra sách có đang được mượn không
             cursor.execute('''
                 SELECT COUNT(*) FROM transactions
                 WHERE book_id = %s AND status = 'borrowed'
@@ -458,6 +561,7 @@ class Admin(Person):
             if cursor.fetchone()[0] > 0:
                 return False, "Không thể xóa sách đang được mượn!"
             
+            # Xóa sách
             cursor.execute("DELETE FROM books WHERE id = %s", (book_id,))
             conn.commit()
             return True, "Đã xóa sách!"
@@ -470,21 +574,29 @@ class Admin(Person):
                 conn.close()
     
     def get_statistics(self):
+        """
+        LẤY THỐNG KÊ HỆ THỐNG
+        - Tổng số đầu sách, tổng số bản, số bản available
+        - Số user, số lượt mượn hiện tại
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
         stats = {}
         
+        # Thống kê sách
         cursor.execute("SELECT COUNT(*), COALESCE(SUM(quantity), 0), COALESCE(SUM(available), 0) FROM books")
         result = cursor.fetchone()
-        stats['total_books'] = result[0]
-        stats['total_copies'] = result[1]
-        stats['available_copies'] = result[2]
-        stats['borrowed_copies'] = stats['total_copies'] - stats['available_copies']
+        stats['total_books'] = result[0]        # Tổng số đầu sách
+        stats['total_copies'] = result[1]       # Tổng số bản
+        stats['available_copies'] = result[2]   # Số bản có sẵn
+        stats['borrowed_copies'] = stats['total_copies'] - stats['available_copies']  # Số bản đang mượn
         
+        # Thống kê user
         cursor.execute("SELECT COUNT(*) FROM users WHERE role = 'user'")
         stats['total_users'] = cursor.fetchone()[0]
         
+        # Số lượt mượn hiện tại
         cursor.execute("SELECT COUNT(*) FROM transactions WHERE status = 'borrowed'")
         stats['active_borrows'] = cursor.fetchone()[0]
         
@@ -492,6 +604,11 @@ class Admin(Person):
         return stats
     
     def get_all_transactions(self):
+        """
+        LẤY LỊCH SỬ MƯỢN TRẢ (50 GIAO DỊCH GẦN NHẤT)
+        - JOIN 3 bảng: transactions, users, books
+        - Sắp xếp theo thời gian mượn (mới nhất trước)
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -509,6 +626,10 @@ class Admin(Person):
         return transactions
 
     def get_book_by_id(self, book_id):
+        """
+        LẤY THÔNG TIN CHI TIẾT MỘT CUỐN SÁCH
+        - Dùng để hiển thị trang chi tiết hoặc form edit
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -536,12 +657,22 @@ class Admin(Person):
         return None
 
 class LibrarySystem:
-    """Hệ thống thư viện"""
+    """
+    CLASS HỆ THỐNG THƯ VIỆN
+    - Quản lý đăng ký, đăng nhập
+    - Lấy danh sách sách
+    """
     
     def __init__(self):
+        """KHỞI TẠO: Tạo kết nối database"""
         self.db = DatabaseManager()
     
     def register(self, username, password, email):
+        """
+        ĐĂNG KÝ TÀI KHOẢN MỚI
+        - Mặc định role = 'user', points = 0
+        - Username phải unique (không trùng)
+        """
         conn = None
         try:
             conn = self.db.get_connection()
@@ -555,6 +686,7 @@ class LibrarySystem:
             conn.commit()
             return True, "Đăng ký thành công!"
         except errors.UniqueViolation:
+            # Lỗi unique: username đã tồn tại
             if conn:
                 conn.rollback()
             return False, "Username đã tồn tại!"
@@ -567,6 +699,11 @@ class LibrarySystem:
                 conn.close()
     
     def login(self, username, password):
+        """
+        ĐĂNG NHẬP
+        - Kiểm tra username và password
+        - Trả về thông tin user nếu đúng
+        """
         conn = None
         try:
             conn = self.db.get_connection()
@@ -581,6 +718,7 @@ class LibrarySystem:
             result = cursor.fetchone()
             
             if result:
+                # Tạo dictionary chứa thông tin user
                 user_dict = {
                     'id': result[0],
                     'username': result[1],
@@ -598,6 +736,11 @@ class LibrarySystem:
                 conn.close()
     
     def get_all_books(self):
+        """
+        LẤY TẤT CẢ SÁCH TRONG HỆ THỐNG
+        - Sắp xếp theo ngày thêm (mới nhất trước)
+        - Trả về dạng list of dictionaries
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -610,6 +753,7 @@ class LibrarySystem:
         rows = cursor.fetchall()
         conn.close()
         
+        # Chuyển đổi từng row thành dictionary
         books = []
         for row in rows:
             books.append({
@@ -626,6 +770,9 @@ class LibrarySystem:
         return books
         
     def get_book_by_id(self, book_id):
+        """
+        LẤY THÔNG TIN CHI TIẾT MỘT CUỐN SÁCH THEO ID
+        """
         conn = self.db.get_connection()
         cursor = conn.cursor()
         
@@ -654,16 +801,26 @@ class LibrarySystem:
 
 
 # ============================================
-# PHẦN 2: FLASK ROUTES
+# PHẦN 2: FLASK ROUTES (CÁC URL ENDPOINT)
 # ============================================
 
+# Khởi tạo hệ thống thư viện (kết nối database)
 try:
     library_system = LibrarySystem()
 except ConnectionError as e:
     print(f"\nLỖI: {e}\n")
     exit(1)
 
+# ============================================
+# DECORATOR: KIỂM TRA ĐĂNG NHẬP
+# ============================================
+
 def login_required(f):
+    """
+    DECORATOR: YÊU CẦU PHẢI ĐĂNG NHẬP
+    - Dùng cho các route cần đăng nhập mới truy cập được
+    - Nếu chưa đăng nhập -> chuyển về trang login
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session:
@@ -673,6 +830,11 @@ def login_required(f):
     return decorated_function
 
 def admin_required(f):
+    """
+    DECORATOR: YÊU CẦU PHẢI LÀ ADMIN
+    - Dùng cho các route chỉ admin mới truy cập được
+    - Nếu không phải admin -> về trang chủ
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session or session['user']['role'] != 'admin':
@@ -681,8 +843,17 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ============================================
+# ROUTES: TRANG CHỦ VÀ XÁC THỰC
+# ============================================
+
 @app.route('/')
 def index():
+    """
+    TRANG CHỦ
+    - Nếu đã đăng nhập: chuyển đến dashboard tương ứng (user/admin)
+    - Nếu chưa đăng nhập: hiển thị danh sách sách
+    """
     if 'user' in session:
         if session['user']['role'] == 'admin':
             return redirect(url_for('admin_dashboard'))
@@ -691,42 +862,61 @@ def index():
     books = library_system.get_all_books()
     return render_template('index.html', books=books)
 
-# THÊM ROUTE NÀY ĐỂ KHẮC PHỤC LỖI BuildError
 @app.route('/book/<int:book_id>')
 def book_detail(book_id):
+    """
+    TRANG CHI TIẾT SÁCH
+    - Hiển thị thông tin đầy đủ của 1 cuốn sách
+    - Route này khắc phục lỗi BuildError khi click vào sách
+    """
     book = library_system.get_book_by_id(book_id)
     if not book:
         flash('Không tìm thấy sách!', 'error')
         return redirect(url_for('index'))
 
-    # Dùng render_template để hiển thị trang chi tiết
+    # Render trang chi tiết sách
     return render_template('book_detail.html', book=book)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    ĐĂNG KÝ TÀI KHOẢN
+    - GET: Hiển thị form đăng ký
+    - POST: Xử lý đăng ký
+    """
     if request.method == 'POST':
+        # Lấy dữ liệu từ form
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
         email = request.form.get('email', '').strip()
         
+        # Kiểm tra dữ liệu có đầy đủ không
         if not username or not password or not email:
             flash('Vui lòng điền đầy đủ thông tin!', 'error')
             return render_template('register.html')
         
+        # Gọi hàm đăng ký từ LibrarySystem
         success, message = library_system.register(username, password, email)
         
         if success:
             flash(message, 'success')
-            return redirect(url_for('login'))
+            return redirect(url_for('login'))  # Chuyển đến trang login
         else:
             flash(message, 'error')
             return render_template('register.html')
     
+    # GET request: hiển thị form
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    ĐĂNG NHẬP
+    - GET: Hiển thị form đăng nhập
+    - POST: Xử lý đăng nhập
+    """
     if request.method == 'POST':
+        # Lấy username và password từ form
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
         
@@ -734,12 +924,15 @@ def login():
             flash('Vui lòng nhập username và password!', 'error')
             return render_template('login.html')
         
+        # Gọi hàm login từ LibrarySystem
         user_data, message = library_system.login(username, password)
         
         if user_data:
+            # Lưu thông tin user vào session (giống cookie)
             session['user'] = user_data
             flash(message, 'success')
             
+            # Chuyển hướng dựa vào role
             if user_data['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
@@ -748,24 +941,38 @@ def login():
             flash(message, 'error')
             return render_template('login.html')
     
+    # GET request: hiển thị form
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
+    """
+    ĐĂNG XUẤT
+    - Xóa session user
+    - Chuyển về trang chủ
+    """
     session.pop('user', None)
     flash('Đã đăng xuất!', 'success')
     return redirect(url_for('index'))
 
+# ============================================
+# ROUTES: DASHBOARD VÀ CHỨC NĂNG USER
+# ============================================
+
 @app.route('/user/dashboard')
 @login_required
 def user_dashboard():
+    """
+    DASHBOARD CỦA USER
+    - Hiển thị: giỏ hàng, sách đang mượn, danh sách sách
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
+    # Tạo object User để gọi các method
     user_obj = User(user_info['id'], user_info['username'], user_info['email'], user_info['points']) 
     
-    cart = user_obj.get_cart()
-    borrowed = user_obj.get_borrowed_books()
-    books = library_system.get_all_books()
+    cart = user_obj.get_cart()                  # Giỏ hàng
+    borrowed = user_obj.get_borrowed_books()     # Sách đang mượn
+    books = library_system.get_all_books()       # Tất cả sách
     
     return render_template('user_dashboard.html', 
                            cart=cart, 
@@ -776,14 +983,17 @@ def user_dashboard():
 @app.route('/user/add-to-cart/<int:book_id>')
 @login_required
 def add_to_cart(book_id):
+    """
+    THÊM SÁCH VÀO GIỎ
+    - Gọi method add_to_cart() của User
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
     user_obj = User(user_info['id'], user_info['username'], user_info['email'], user_info['points']) 
     
     success, message = user_obj.add_to_cart(book_id)
     flash(message, 'success' if success else 'error')
     
-    # Kiểm tra xem user có phải admin không (trường hợp admin xem trang index)
+    # Nếu user là admin thì về admin dashboard
     if user_info['role'] == 'admin':
          return redirect(url_for('admin_dashboard'))
          
@@ -792,8 +1002,11 @@ def add_to_cart(book_id):
 @app.route('/user/checkout')
 @login_required
 def checkout():
+    """
+    THANH TOÁN (MƯỢN SÁCH)
+    - Mượn tất cả sách trong giỏ
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
     user_obj = User(user_info['id'], user_info['username'], user_info['email'], user_info['points']) 
     
     success, message = user_obj.checkout()
@@ -804,29 +1017,41 @@ def checkout():
 @app.route('/user/return/<int:transaction_id>')
 @login_required
 def return_book(transaction_id):
+    """
+    TRẢ SÁCH
+    - Trả sách theo transaction_id
+    - Cập nhật points trong session sau khi trả
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
     user_obj = User(user_info['id'], user_info['username'], user_info['email'], user_info['points'])
     
     success, message = user_obj.return_book(transaction_id)
     
     if success:
-        # Cập nhật points trong session sau khi trả sách
+        # Cập nhật points trong session
         session['user']['points'] = user_obj.points
     
     flash(message, 'success' if success else 'error')
     return redirect(url_for('user_dashboard'))
 
+# ============================================
+# ROUTES: DASHBOARD VÀ CHỨC NĂNG ADMIN
+# ============================================
+
 @app.route('/admin/dashboard')
 @admin_required
 def admin_dashboard():
+    """
+    DASHBOARD CỦA ADMIN
+    - Hiển thị: thống kê, danh sách sách, lịch sử giao dịch
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
+    # Tạo object Admin để gọi các method
     admin_obj = Admin(user_info['id'], user_info['username'], user_info['email'], user_info['points'])
     
-    stats = admin_obj.get_statistics()
-    books = library_system.get_all_books()
-    transactions = admin_obj.get_all_transactions()
+    stats = admin_obj.get_statistics()          # Thống kê
+    books = library_system.get_all_books()       # Danh sách sách
+    transactions = admin_obj.get_all_transactions()  # Lịch sử
     
     return render_template('admin_dashboard.html',
                            stats=stats,
@@ -837,10 +1062,15 @@ def admin_dashboard():
 @app.route('/admin/add-book', methods=['POST'])
 @admin_required
 def admin_add_book():
+    """
+    THÊM SÁCH MỚI (ADMIN)
+    - Lấy dữ liệu từ form
+    - Gọi method add_book() của Admin
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
     admin_obj = Admin(user_info['id'], user_info['username'], user_info['email'], user_info['points'])
     
+    # Lấy dữ liệu từ form
     title = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
     category = request.form.get('category', '').strip()
@@ -849,6 +1079,7 @@ def admin_add_book():
     image_url = request.form.get('image_url', '').strip()
     description = request.form.get('description', '').strip()
     
+    # Validate dữ liệu
     if not title or not author or not category or quantity <= 0:
         flash('Vui lòng nhập đầy đủ Title, Author, Category và Quantity > 0.', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -861,8 +1092,11 @@ def admin_add_book():
 @app.route('/admin/delete-book/<int:book_id>')
 @admin_required
 def admin_delete_book(book_id):
+    """
+    XÓA SÁCH (ADMIN)
+    - Gọi method delete_book() của Admin
+    """
     user_info = session['user']
-    # ĐÃ SỬA: Đảm bảo truyền points
     admin_obj = Admin(user_info['id'], user_info['username'], user_info['email'], user_info['points'])
     
     success, message = admin_obj.delete_book(book_id)
@@ -870,10 +1104,14 @@ def admin_delete_book(book_id):
     
     return redirect(url_for('admin_dashboard'))
 
-# Chức năng số lượng sách
 @app.route('/admin/add_stock/<int:book_id>', methods=['POST'])
-# @admin_required # Bỏ comment nếu bạn muốn yêu cầu quyền Admin
+# @admin_required  # Bỏ comment nếu muốn yêu cầu quyền Admin
 def admin_add_stock(book_id):
+    """
+    THÊM SỐ LƯỢNG SÁCH VÀO KHO
+    - Tăng cả quantity (tổng số) và available (có sẵn)
+    - Dùng khi nhập thêm sách vào thư viện
+    """
     conn = None 
     try:
         # 1. Lấy số lượng muốn thêm từ form (input name="quantity_added")
@@ -882,6 +1120,7 @@ def admin_add_stock(book_id):
         flash('Lỗi: Số lượng thêm vào phải là số nguyên hợp lệ.', 'error')
         return redirect(url_for('admin_dashboard'))
 
+    # Kiểm tra số lượng phải > 0
     if quantity_to_add <= 0:
         flash('Vui lòng nhập số lượng lớn hơn 0.', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -902,9 +1141,9 @@ def admin_add_stock(book_id):
             """, 
             (quantity_to_add, quantity_to_add, book_id)
         )
-        conn.commit() # BẮT BUỘC: Lưu thay đổi
+        conn.commit()  # BẮT BUỘC: Lưu thay đổi vào database
         
-        # Lấy tên sách để thông báo
+        # Lấy tên sách để hiển thị thông báo
         cursor.execute("SELECT title FROM books WHERE id = %s", (book_id,))
         book_title = cursor.fetchone()[0] if cursor.rowcount else f'ID: {book_id}'
         
@@ -912,24 +1151,88 @@ def admin_add_stock(book_id):
         
     except Exception as e:
         if conn:
-            conn.rollback() # Hoàn tác nếu có lỗi
+            conn.rollback()  # Hoàn tác nếu có lỗi
         flash(f'Lỗi hệ thống hoặc database khi thêm số lượng: {e}', 'error')
         
     finally:
+        # Đóng kết nối database
         if conn:
             cursor.close()
             conn.close() 
 
     return redirect(url_for('admin_dashboard'))
 
+#===========================================
+# TÌM KIẾM SÁCH
+#===========================================
+@app.route('/search', methods=['GET', 'POST'])
+def search_books():
+    query = ''
+    results = []
+    conn = None
+    cursor = None  # ✅ đảm bảo biến này luôn tồn tại
+
+    if request.method == 'POST':
+        query = request.form.get('query', '').strip()
+        if not query:
+            flash('Vui lòng nhập từ khóa tìm kiếm!', 'error')
+            return redirect(url_for('search_books'))
+
+        try:
+            # ✅ Kết nối database PostgreSQL
+            conn = library_system.db.get_connection()
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            # ✅ Tìm theo tên, tác giả, hoặc năm
+            sql = """
+                SELECT * FROM books
+                WHERE title ILIKE %s
+                OR author ILIKE %s
+                OR CAST(year AS TEXT) ILIKE %s
+                ORDER BY title ASC
+            """
+            values = (f'%{query}%', f'%{query}%', f'%{query}%')
+            cursor.execute(sql, values)
+            results = cursor.fetchall()
+
+            if not results:
+                flash(f'Không tìm thấy sách nào phù hợp với từ khóa "{query}"!', 'info')
+
+
+        except Exception as e:
+            flash(f'Lỗi khi tìm kiếm sách: {e}', 'error')
+
+        finally:
+            # ✅ Chỉ đóng nếu thực sự tồn tại
+            if cursor is not None:
+                try:
+                    cursor.close()
+                except:
+                    pass
+            if conn is not None:
+                try:
+                    conn.close()
+                except:
+                    pass
+
+    return render_template('search.html', query=query, results=results)
+
+
+# ============================================
+# KHỞI CHẠY ỨNG DỤNG
+# ============================================
+
 if __name__ == '__main__':
     print("="*60)
-    print("  HỆ THỐNG THƯ VIỆN - FLASK + POSTGRESQL + OOP")
+    print("  HỆ THỐNG THƯ VIỆN - FLASK + POSTGRESQL + OOP")
     print("="*60)
     print("\n✅ Server: http://127.0.0.1:5000")
     print("\n📌 Tài khoản mẫu:")
-    print("   Admin: admin / admin123")
-    print("   User:  user1 / user123")
+    print("   Admin: admin / admin123")
+    print("   User:  user1 / user123")
     print("="*60)
     
+    # Chạy Flask server
+    # debug=True: tự động reload khi code thay đổi
+    # port=5000: chạy trên cổng 5000
     app.run(debug=True, port=5000)
