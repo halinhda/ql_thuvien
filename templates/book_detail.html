@@ -1,71 +1,70 @@
 {% extends "layout.html" %}
-
 {% block content %}
 <div>
-    <div>
-        <div>
-            <h1>Chi Tiết Sách: {{ book.title | default('Không rõ tiêu đề') }}</h1>
-            <a href="{{ url_for('index') }}" class="btn-back">
-                Quay lại Trang chủ
-            </a>
-        </div>
-    </div>
-    
-        <div class="book-detail-wrapper"> 
-        
-                <div class="book-image-col"> 
-                        <img src="{{ book.image_url | default('/static/images/default_book.png') }}" 
-                 alt="{{ book.title | default('Ảnh sách') }}"
-                 class="detail-book-img"> 
-        </div>
+    <div>
+        <div>
+            <h1>Chi Tiết Sách: {{ book.title | default('Không rõ tiêu đề') }}</h1>
+            <a href="{{ url_for('index') }}" class="btn-back">
+                Quay lại Trang chủ
+            </a>
+        </div>
+    </div>
 
-                <div class="book-info-col">
-            <h4>Thông tin cơ bản</h4>
-                        <table class="detail-table"> 
-                <tbody>
-                    <tr>
-                        <th>Tác giả</th>
-                        <td>{{ book.author | default('N/A') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Thể loại</th>
-                        <td>{{ book.category | default('N/A') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Năm xuất bản</th>
-                        <td>{{ book.year | default('N/A') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tổng số lượng</th>
-                        <td>{{ book.quantity | default(0) }} cuốn</td>
-                    </tr>
-                    <tr>
-                        <th>Tình trạng</th>
-                        <td>
-                            {% if book.available is defined and book.available > 0 %}
-                                <span>Còn {{ book.available }} cuốn</span>
-                            {% else %}
-                                <span>Đã hết hàng</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <hr>
-            <h4>Mô tả</h4>
-            <p>{{ book.description | default('Chưa có mô tả.') }}</p>
-            
-                        {% if session.get('user') and session['user']['role'] == 'user' %}
-                {% if book.available is defined and book.available > 0 %}
-                                        <a href="{{ url_for('add_to_cart', book_id=book.id) }}" class="btn-primary">Thêm vào Giỏ Hàng</a>
-                    <a href="{{ url_for('add_to_cart', book_id=book.id) }}" class="btn-primary">Mượn ngay</a> 
-                {% else %}
-                    <button disabled>Hết Sách</button>
-                {% endif %}
-            {% endif %}
-            
-        </div>
-    </div>
+        <div class="book-detail-wrapper"> 
+        
+                <div class="book-image-col"> 
+                        <img src="{{ book.image_url | default('/static/images/default_book.png') }}" 
+                 alt="{{ book.title | default('Ảnh sách') }}"
+                 class="detail-book-img"> 
+        </div>
+
+                <div class="book-info-col">
+            <h4>Thông tin cơ bản</h4>
+                        <table class="detail-table"> 
+                <tbody>
+                    <tr>
+                        <th>Tác giả</th>
+                        <td>{{ book.author | default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Thể loại</th>
+                        <td>{{ book.category | default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Năm xuất bản</th>
+                        <td>{{ book.year | default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tổng số lượng</th>
+                        <td>{{ book.quantity | default(0) }} cuốn</td>
+                    </tr>
+                    <tr>
+                        <th>Tình trạng</th>
+                        <td>
+                            {% if book.available is defined and book.available > 0 %}
+                                <span>Còn {{ book.available }} cuốn</span>
+                            {% else %}
+                                <span>Đã hết hàng</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <hr>
+            <h4>Mô tả</h4>
+            <p>{{ book.description | default('Chưa có mô tả.') }}</p>
+            
+                        {% if session.get('user') and session['user']['role'] == 'user' %}
+                {% if book.available is defined and book.available > 0 %}
+                                        <a href="{{ url_for('add_to_cart', book_id=book.id) }}" class="btn-primary">Thêm vào Giỏ Hàng</a>
+                    <a href="{{ url_for('add_to_cart', book_id=book.id) }}" class="btn-primary">Mượn ngay</a> 
+                {% else %}
+                    <button disabled>Hết Sách</button>
+                {% endif %}
+            {% endif %}
+            
+        </div>
+    </div>
 </div>
 {% endblock %}

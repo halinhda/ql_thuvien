@@ -6,7 +6,7 @@
     <h1>Danh Mục Sách Thư Viện</h1>
 
     {% if books %}
-    <p>Đang hiển thị tổng cộng **{{ books|length }}** cuốn sách.</p>
+    <p>Đang hiển thị tổng cộng {{ books|length }} cuốn sách.</p>
 
     <div class="book-grid">
         {% for book in books %}
@@ -21,7 +21,7 @@
                 <h6>Tác giả: {{ book.author }}</h6>
                 
                 <p> 
-                    <span>Năm xuất bản: **{{ book.year }}**</span>
+                    <span>Năm xuất bản: {{ book.year }}</span>
                     
                     <strong>Tình trạng:</strong> 
                     

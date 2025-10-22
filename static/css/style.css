@@ -345,9 +345,21 @@ nav ul li {
 }
 
 /* Cột Ảnh */
-.book-image-col {
+/*.book-image-col {
     flex: 0 0 300px;
+}*/
+.book-image-col {
+    flex: 0 0 200px; /* Giảm chiều rộng cố định */
+    overflow: hidden; /* Ẩn phần vượt quá */
 }
+
+.book-image-col img {
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* Giữ nguyên tỷ lệ ảnh, không cắt */
+    border-radius: 4px;
+}
+
 
 /* Cột Thông tin */
 .book-info-col {
