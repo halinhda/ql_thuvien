@@ -12,6 +12,8 @@ from psycopg2 import errors  # Import các lỗi của PostgreSQL
 from datetime import datetime, timedelta  # Xử lý ngày tháng
 from abc import ABC, abstractmethod  # Tạo class trừu tượng (Abstract Base Class)
 from functools import wraps  # Dùng để tạo decorator
+import os
+from dotenv import load_dotenv 
 
 # KHỞI TẠO ỨNG DỤNG FLASK
 app = Flask(__name__)
@@ -21,63 +23,52 @@ app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')  # Khóa b
 # PHẦN 1: CÁC CLASS OOP
 # ============================================
 
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import os
-import psycopg2
-from psycopg2 import errors
-from datetime import datetime, timedelta
-from abc import ABC, abstractmethod
-from functools import wraps
-
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')
-
-# ============================================
-# PHẦN 1: CÁC CLASS OOP
-# ============================================
-
 class DatabaseManager:
     """
-    CLASS QUẢN LÝ DATABASE POSTGRESQL
-    - Kết nối với database (local hoặc Render)
-    - Tạo bảng và dữ liệu mẫu
-    - Cung cấp connection để các class khác sử dụng
+    QUẢN LÝ DATABASE (LOCAL + RENDER)
+    - Nếu local PostgreSQL đang chạy → dùng local (bản demo cá nhân)
+    - Nếu local không mở → fallback sang Render database
     """
-    
-    # CÁC THÔNG SỐ KẾT NỐI DATABASE LOCAL (dùng khi chạy trên máy tính)
+
     LOCAL_DB_CONFIG = {
-        'dbname': "library_db",      # Tên database
-        'user': "admin",             # Tên user
-        'password': "1234",          # Mật khẩu
-        'host': "localhost",         # Địa chỉ máy chủ
-        'port': "5432"               # Cổng kết nối
+        'dbname': "library_db",
+        'user': "admin",     # hoặc user bạn tạo
+        'password': "1234",
+        'host': "localhost",
+        'port': "5432"
     }
 
     def __init__(self):
-        """KHỞI TẠO: Lấy URL database và tạo các bảng nếu chưa có"""
-        # Lấy DATABASE_URL từ Render (hoặc local nếu chưa có)
-        self.DATABASE_URL = os.environ.get('DATABASE_URL')
-        if self.DATABASE_URL:
-            print(f"[INFO] Kết nối tới Render PostgreSQL: {self.DATABASE_URL}")
-        else:
-            print(f"[WARNING] Không tìm thấy DATABASE_URL. Đang dùng cấu hình local.")
-        self.init_database()  # Gọi hàm khởi tạo database
+        load_dotenv()  # đọc DATABASE_URL từ .env
+        self.DATABASE_URL = os.getenv("DATABASE_URL")
+        print("🚀 Khởi tạo DatabaseManager...")
+        self.active_db = None
+        self.init_database()
 
     def get_connection(self):
         """
-        TẠO KẾT NỐI ĐÉN POSTGRESQL
-        - Nếu có DATABASE_URL: dùng URL từ Render
-        - Nếu không: dùng cấu hình local
+        ƯU TIÊN LOCAL → nếu lỗi → Render
         """
+        # Thử Local trước
         try:
-            if self.DATABASE_URL:
-                conn = psycopg2.connect(self.DATABASE_URL)  # Kết nối qua URL
-            else:
-                conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)  # Kết nối qua config
+            conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)
+            self.active_db = "local"
+            print("💻 Đang sử dụng database LOCAL (demo cá nhân).")
             return conn
-        except psycopg2.Error as e:
-            print(f"[ERROR] Kết nối PostgreSQL thất bại: {e}")
-            raise ConnectionError(f"Không thể kết nối PostgreSQL: {e}")
+        except Exception as e:
+            print("⚠️ Local DB không khả dụng:", e)
+
+        # Nếu Local lỗi → thử Render
+        try:
+            if not self.DATABASE_URL:
+                raise Exception("Không có DATABASE_URL trong .env!")
+            conn = psycopg2.connect(self.DATABASE_URL, sslmode='require')
+            self.active_db = "render"
+            print("🌐 Kết nối tới Render PostgreSQL thành công!")
+            return conn
+        except Exception as e:
+            print("❌ Không thể kết nối tới Render DB:", e)
+            raise RuntimeError("Không thể kết nối tới cả Local và Render Database!")
 
     def init_database(self):
         """
