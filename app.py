@@ -58,16 +58,7 @@ class DatabaseManager:
         except Exception as e:
             print("Local DB không khả dụng:", e)
 
-          # 2️⃣ Render
-        try:
-            if not self.DATABASE_URL_RENDER:
-                raise Exception("Không có DATABASE_URL_RENDER trong .env!")
-            conn = psycopg2.connect(self.DATABASE_URL_RENDER, sslmode='require')
-            self.active_db = "render"
-            print("🌍 Kết nối RENDER PostgreSQL thành công!")
-            return conn
-        except Exception as e:
-            print("⚠️ Render DB không khả dụng:", e)
+         
 
         # 3️.Neon
         try:
