@@ -25,50 +25,54 @@ app.secret_key = os.environ.get('SECRET_KEY', 'default_fallback_key')  # Khóa b
 
 class DatabaseManager:
     """
-    QUẢN LÝ DATABASE (LOCAL + RENDER)
-    - Nếu local PostgreSQL đang chạy → dùng local (bản demo cá nhân)
-    - Nếu local không mở → fallback sang Render database
+    QUẢN LÝ DATABASE (LOCAL + RENDER + NEON)
+    - Ưu tiên Local → Render → Neon
     """
 
     LOCAL_DB_CONFIG = {
         'dbname': "library_db",
-        'user': "admin",     # hoặc user bạn tạo
+        'user': "admin",
         'password': "1234",
         'host': "localhost",
         'port': "5432"
     }
 
     def __init__(self):
-        load_dotenv()  # đọc DATABASE_URL từ .env
-        self.DATABASE_URL = os.getenv("DATABASE_URL")
-        print("🚀 Khởi tạo DatabaseManager...")
+        print(" Khởi tạo DatabaseManager...")
+        load_dotenv()  # Đọc .env
+
+        self.DATABASE_URL_RENDER = os.getenv("DATABASE_URL_RENDER")
+        self.DATABASE_URL_NEON = os.getenv("DATABASE_URL_NEON")
         self.active_db = None
-        self.init_database()
 
     def get_connection(self):
         """
-        ƯU TIÊN LOCAL → nếu lỗi → Render
+        Tự động kết nối: Local → Render → Neon
         """
-        # Thử Local trước
+        # 1️.Local
         try:
             conn = psycopg2.connect(**self.LOCAL_DB_CONFIG)
             self.active_db = "local"
-            print("💻 Đang sử dụng database LOCAL (demo cá nhân).")
+            print("Kết nối LOCAL thành công (demo cá nhân).")
             return conn
         except Exception as e:
-            print("⚠️ Local DB không khả dụng:", e)
+            print("Local DB không khả dụng:", e)
 
-        # Nếu Local lỗi → thử Render
+        
+
+        # 3️.Neon
         try:
-            if not self.DATABASE_URL:
-                raise Exception("Không có DATABASE_URL trong .env!")
-            conn = psycopg2.connect(self.DATABASE_URL, sslmode='require')
-            self.active_db = "render"
-            print("🌐 Kết nối tới Render PostgreSQL thành công!")
+            if not self.DATABASE_URL_NEON:
+                raise Exception("Không có DATABASE_URL_NEON trong .env!")
+            conn = psycopg2.connect(self.DATABASE_URL_NEON, sslmode='require')
+            self.active_db = "neon"
+            print("Kết nối NEON PostgreSQL thành công!")
             return conn
         except Exception as e:
-            print("❌ Không thể kết nối tới Render DB:", e)
-            raise RuntimeError("Không thể kết nối tới cả Local và Render Database!")
+            print("Không thể kết nối Neon DB:", e)
+            raise RuntimeError("Không thể kết nối tới bất kỳ database nào!")
+
+
 
     def init_database(self):
         """
