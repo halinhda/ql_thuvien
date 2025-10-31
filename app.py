@@ -804,6 +804,7 @@ class LibrarySystem:
         return None
 
 
+
 # ============================================
 # PHẦN 2: FLASK ROUTES (CÁC URL ENDPOINT)
 # ============================================
@@ -1174,7 +1175,7 @@ def search_books():
     query = ''
     results = []
     conn = None
-    cursor = None  # ✅ đảm bảo biến này luôn tồn tại
+    cursor = None  #  đảm bảo biến này luôn tồn tại
 
     if request.method == 'POST':
         query = request.form.get('query', '').strip()
@@ -1183,11 +1184,11 @@ def search_books():
             return redirect(url_for('search_books'))
 
         try:
-            # ✅ Kết nối database PostgreSQL
+            #  Kết nối database PostgreSQL
             conn = library_system.db.get_connection()
             cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-            # ✅ Tìm theo tên, tác giả, hoặc năm
+            # Tìm theo tên, tác giả, hoặc năm
             sql = """
                 SELECT * FROM books
                 WHERE title ILIKE %s
@@ -1207,7 +1208,7 @@ def search_books():
             flash(f'Lỗi khi tìm kiếm sách: {e}', 'error')
 
         finally:
-            # ✅ Chỉ đóng nếu thực sự tồn tại
+            # Chỉ đóng nếu thực sự tồn tại
             if cursor is not None:
                 try:
                     cursor.close()
@@ -1221,7 +1222,6 @@ def search_books():
 
     return render_template('search.html', query=query, results=results)
 
-
 # ============================================
 # KHỞI CHẠY ỨNG DỤNG
 # ============================================
@@ -1230,7 +1230,7 @@ if __name__ == '__main__':
     print("="*60)
     print("  HỆ THỐNG THƯ VIỆN - FLASK + POSTGRESQL + OOP")
     print("="*60)
-    print("\n✅ Server: http://127.0.0.1:5000")
+    print("\nServer: http://127.0.0.1:5000")
     print("\n📌 Tài khoản mẫu:")
     print("   Admin: admin / admin123")
     print("   User:  user1 / user123")

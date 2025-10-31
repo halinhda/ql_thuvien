@@ -1,0 +1,52 @@
+// Library System UML Diagram
+digraph {
+	fontname=Helvetica rankdir=TB splines=ortho
+	Person [label="<<i>Person</i>>
+|- {'user_id': 'int'}
+- {'username': 'str'}
+- {'email': 'str'}
+- {'role': 'str'}
+- {'points': 'int'}|+ get_permissions()
++ get_info()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	User [label="<<b>User</b>>
+||+ {'add_to_cart(book_id': 'int)'}
++ get_cart()
++ checkout()
++ {'return_book(transaction_id': 'int)'}
++ get_borrowed_books()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	Admin [label="<<b>Admin</b>>
+||+ add_book(title, author, category, year, quantity)
++ {'delete_book(book_id': 'int)'}
++ get_statistics()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	Book [label="<<b>Book</b>>
+|- {'id': 'int'}
+- {'title': 'str'}
+- {'author': 'str'}
+- {'category': 'str'}
+- {'year': 'int'}
+- {'quantity': 'int'}
+- {'available': 'int'}|+ borrow()
++ return_book()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	Transaction [label="<<b>Transaction</b>>
+|- {'transaction_id': 'int'}
+- {'user_id': 'int'}
+- {'book_id': 'int'}
+- {'borrow_date': 'date'}
+- {'due_date': 'date'}
+- {'return_date': 'date'}
+- {'status': 'str'}
+- {'points_earned': 'int'}|+ create_transaction()
++ complete_transaction()
++ calculate_points()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	DatabaseManager [label="<<b>DatabaseManager</b>>
+||+ get_connection()
++ init_database()
++ create_sample_data()" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	LibrarySystem [label="<<b>LibrarySystem</b>>
+||+ register(username, password, email)
++ login(username, password)
++ get_all_books()
++ {'get_book_by_id(book_id': 'int)'}" fillcolor="#f9f9f9" shape=record style="rounded,filled"]
+	Person -> User [arrowhead=onormal]
+	Person -> Admin [arrowhead=onormal]
+}
